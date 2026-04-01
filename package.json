@@ -1,0 +1,45 @@
+{
+  "name": "dukamanager",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@protobufjs/codegen": "^2.0.4",
+    "@protobufjs/fetch": "^1.1.0",
+    "@protobufjs/path": "^1.1.2",
+    "africastalking": "^0.7.9",
+    "bunny.net": "^1.0.0",
+    "firebase": "^12.11.0",
+    "framer-motion": "^12.38.0",
+    "html2canvas": "^1.4.1",
+    "html5-qrcode": "^2.3.8",
+    "jspdf": "^4.2.1",
+    "lodash.camelcase": "^4.3.0",
+    "long": "^5.3.2",
+    "next": "14.2.35",
+    "protobufjs": "^8.0.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.72.0",
+    "react-hot-toast": "^2.6.0",
+    "recharts": "^3.8.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

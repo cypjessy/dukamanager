@@ -1,0 +1,142 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Get the requesting user's shopId from the users collection
+    function getUserShopId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shopId;
+    }
+
+    // Get the requesting user's role
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // Check if user belongs to a specific shop
+    function belongsToShop(shopId) {
+      return isAuthenticated() && getUserShopId() == shopId;
+    }
+
+    // Check if user is owner or manager of their shop
+    function isOwnerOrManager() {
+      return isAuthenticated() && (getUserRole() == "owner" || getUserRole() == "manager");
+    }
+
+    // Check if user is owner
+    function isOwner() {
+      return isAuthenticated() && getUserRole() == "owner";
+    }
+
+    // ===== USERS COLLECTION =====
+    // Users can read their own document
+    // Owners/managers can read users in their shop
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId ||
+        isOwnerOrManager()
+      );
+      // Only owners can update user roles
+      allow update: if isOwner() && request.auth.uid != userId;
+      // Users can update their own profile (but not role/shopId)
+      allow update: if request.auth.uid == userId
+        && !("role" in request.resource.data.diff(resource.data).affectedKeys())
+        && !("shopId" in request.resource.data.diff(resource.data).affectedKeys());
+    }
+
+    // ===== SHOPS COLLECTION =====
+    match /shops/{shopId} {
+      // Users can read their own shop document
+      allow read: if belongsToShop(shopId);
+      // Only shop owner can update shop settings
+      allow update: if isOwner() && belongsToShop(shopId);
+      // Shop creation handled server-side during registration
+      allow create: if isAuthenticated();
+    }
+
+    // ===== SHOP SUBCOLLECTIONS =====
+    // All shop data is isolated by shopId
+    // Any authenticated user belonging to the shop can read/write
+    match /shops/{shopId}/{collection}/{docId} {
+      // All shop members can read shop data
+      allow read: if belongsToShop(shopId);
+
+      // Owners and managers can create/update/delete most data
+      allow create: if belongsToShop(shopId) && isOwnerOrManager();
+
+      allow update: if belongsToShop(shopId) && isOwnerOrManager();
+
+      allow delete: if belongsToShop(shopId) && isOwner();
+
+      // Cashiers can create sales and update inventory (stock changes from sales)
+      allow create: if belongsToShop(shopId) && getUserRole() == "cashier"
+        && collection in ["sales"];
+
+      // Cashiers can update inventory quantities (for stock deduction from sales)
+      allow update: if belongsToShop(shopId) && getUserRole() == "cashier"
+        && collection in ["inventory", "products"];
+    }
+
+    // ===== SPECIFIC SUBCOLLECTION RULES =====
+
+    // Products subcollection
+    match /shops/{shopId}/products/{productId} {
+      allow read: if belongsToShop(shopId);
+      allow create: if belongsToShop(shopId) && isOwnerOrManager();
+      allow update: if belongsToShop(shopId) && (isOwnerOrManager() || getUserRole() == "cashier");
+      allow delete: if belongsToShop(shopId) && isOwner();
+    }
+
+    // Sales subcollection
+    match /shops/{shopId}/sales/{saleId} {
+      allow read: if belongsToShop(shopId);
+      allow create: if belongsToShop(shopId) && (isOwnerOrManager() || getUserRole() == "cashier");
+      allow update: if belongsToShop(shopId) && isOwnerOrManager();
+      allow delete: if belongsToShop(shopId) && isOwner();
+    }
+
+    // Customers subcollection
+    match /shops/{shopId}/customers/{customerId} {
+      allow read: if belongsToShop(shopId);
+      allow create, update: if belongsToShop(shopId) && (isOwnerOrManager() || getUserRole() == "cashier");
+      allow delete: if belongsToShop(shopId) && isOwner();
+    }
+
+    // Suppliers subcollection
+    match /shops/{shopId}/suppliers/{supplierId} {
+      allow read: if belongsToShop(shopId);
+      allow create, update, delete: if belongsToShop(shopId) && isOwnerOrManager();
+    }
+
+    // Employees subcollection
+    match /shops/{shopId}/employees/{employeeId} {
+      allow read: if belongsToShop(shopId) && isOwnerOrManager();
+      allow create, update, delete: if belongsToShop(shopId) && isOwner();
+    }
+
+    // Expenses subcollection
+    match /shops/{shopId}/expenses/{expenseId} {
+      allow read: if belongsToShop(shopId) && isOwnerOrManager();
+      allow create, update: if belongsToShop(shopId) && isOwnerOrManager();
+      allow delete: if belongsToShop(shopId) && isOwner();
+    }
+
+    // Returns subcollection
+    match /shops/{shopId}/returns/{returnId} {
+      allow read: if belongsToShop(shopId);
+      allow create, update: if belongsToShop(shopId) && (isOwnerOrManager() || getUserRole() == "cashier");
+      allow delete: if belongsToShop(shopId) && isOwner();
+    }
+
+    // Documents subcollection
+    match /shops/{shopId}/documents/{documentId} {
+      allow read: if belongsToShop(shopId);
+      allow create, update, delete: if belongsToShop(shopId) && isOwnerOrManager();
+    }
+  }
+}
