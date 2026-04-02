@@ -63,9 +63,9 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
   const lastScanRef = useRef<{ code: string; time: number } | null>(null);
 
   const startCameraScanner = useCallback(async () => {
-    if (!scannerRef.current) return;
+     if (!scannerRef.current) return;
      _setCameraError(null);
-    setScanState("scanning");
+     setScanState("scanning");
 
     try {
       const { Html5Qrcode } = await import("html5-qrcode");
@@ -294,17 +294,19 @@ function ScannerContent(p: ScannerContentProps) {
             { key: "camera" as ScanMode, label: "Camera", icon: "\uD83D\uDCF7" },
             { key: "hardware" as ScanMode, label: "Scanner", icon: "\uD83D\uDD0D" },
           ]).map((m) => (
-            <button key={m.key} onClick={() => {
-              if (m.key === "camera" && cameraPermission === "prompt") { onCameraPermission(); return; }
-              setMode(m.key);
-              if (m.key === "manual") setScanState("idle");
-              if (m.key === "hardware") setScanState("scanning");
-            }}
-              className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 min-h-[36px] transition-all ${
-                mode === m.key ? "bg-terracotta-500 text-white" : "bg-warm-100bg-warm-800 text-warm-500text-warm-400"
-              }`}>
-              <span>{m.icon}</span> {m.label}
-            </button>
+               <button key={m.key} onClick={() => {
+               if (m.key === "camera" && cameraPermission === "prompt") { onCameraPermission(); return; }
+               setMode(m.key);
+               if (m.key === "manual") setScanState("idle");
+               if (m.key === "hardware") setScanState("scanning");
+             }}
+               className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 min-h-[36px] transition-all ${
+                 mode === m.key 
+                   ? "bg-terracotta-500 text-white shadow-md" 
+                   : "bg-warm-100/30 bg-warm-800/30 text-warm-500/60 text-warm-400/60 backdrop-blur backdrop-blur-md hover:bg-warm-100/40 hover:bg-warm-800/40"
+               }`}>
+               <span>{m.icon}</span> {m.label}
+             </button>
           ))}
         </div>
       </div>
