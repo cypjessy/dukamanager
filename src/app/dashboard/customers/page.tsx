@@ -7,6 +7,7 @@ import { segmentConfig } from "@/data/customerData";
 import { useCustomersFirestore } from "@/hooks/useCustomersFirestore";
 import { useLocale } from "@/providers/LocaleProvider";
 import { useViewport } from "@/providers/ViewportProvider";
+import { useSettingsFirestore } from "@/hooks/useSettingsFirestore";
 import type { CustomerFormValues } from "@/lib/customerValidations";
 import CustomerCard from "@/components/customers/CustomerCard";
 import CustomerProfile from "@/components/customers/CustomerProfile";
@@ -19,6 +20,7 @@ export default function CustomersPage() {
   const { locale } = useLocale();
   const { isMobile } = useViewport();
   const { customers, creditApplications, loading, addCustomer } = useCustomersFirestore();
+  const { shopSettings } = useSettingsFirestore();
   const [view, setView] = useState<CustomerView>("directory");
   const [segFilter, setSegFilter] = useState<CustomerSegment | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,11 +49,20 @@ export default function CustomersPage() {
   const handleSaveCustomer = useCallback(async (data: CustomerFormValues) => {
     try {
       await addCustomer(data);
+      if (data.phone) {
+        const shopName = shopSettings.shopName || "DukaManager";
+        const welcomeMsg = `Welcome to ${shopName}! Thank you for registering. You'll receive updates on promotions and your loyalty points.`;
+        fetch("/api/sms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ to: data.phone, message: welcomeMsg, type: "default" }),
+        }).catch(() => {});
+      }
       setShowAddModal(false);
     } catch (err) {
       console.error("Failed to save customer:", err);
     }
-  }, [addCustomer]);
+  }, [addCustomer, shopSettings.shopName]);
 
   if (loading) {
     return (

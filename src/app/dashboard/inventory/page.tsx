@@ -19,7 +19,6 @@ import ProductCard from "@/components/inventory/ProductCard";
 import AddInventoryDialog from "@/components/inventory/AddInventoryDialog";
 import InventoryAnalytics from "@/components/inventory/InventoryAnalytics";
 import FilterChips from "@/components/inventory/FilterChips";
-import QuickActionBar from "@/components/inventory/QuickActionBar";
 import ProductHistoryPanel from "@/components/inventory/ProductHistoryPanel";
 import BarcodePrintDialog from "@/components/inventory/BarcodePrintDialog";
 
@@ -32,7 +31,6 @@ export default function InventoryPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [stockFilter, setStockFilter] = useState<StockStatus | "all">("all");
   const [viewMode, setViewMode] = useState<ViewMode>("table");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [showAnalytics, setShowAnalytics] = useState(false);
@@ -64,22 +62,6 @@ export default function InventoryPage() {
     const cat = KENYAN_CATEGORIES.find(c => c.value === selectedCategory);
     return locale === "sw" ? (cat?.labelSw || selectedCategory) : (cat?.label || selectedCategory);
   }, [selectedCategory, locale]);
-
-  const handleToggleSelect = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const handleToggleSelectAll = useCallback(() => {
-    setSelectedIds((prev) => {
-      if (prev.size === filtered.length) return new Set();
-      return new Set(filtered.map((p) => p.id));
-    });
-  }, [filtered]);
 
   const handleAdjustQty = useCallback(async (id: string, delta: number) => {
     const p = products.find(prod => prod.id === id);
@@ -117,7 +99,6 @@ export default function InventoryPage() {
 
   const handleDelete = useCallback(async (id: string) => {
     await deleteProduct(id);
-    setSelectedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
   }, [deleteProduct]);
 
   const handleAdd = useCallback(() => {
@@ -180,24 +161,6 @@ export default function InventoryPage() {
     }
     setModalOpen(false);
   }, [editProduct, addProduct, updateProduct, shopId]);
-
-  const handleBulkDelete = useCallback(async () => {
-    for (const id of Array.from(selectedIds)) {
-        await deleteProduct(id);
-    }
-    setSelectedIds(new Set());
-  }, [selectedIds, deleteProduct]);
-
-  const handleBulkExport = useCallback(() => {
-    const csv = ["Name,SKU,Category,Qty,Price,Status"]
-      .concat(products.filter((p) => selectedIds.has(p.id)).map((p) => `${p.name},${p.sku},${p.category},${p.quantity},${p.sellingPrice},${getStockStatus(p)}`))
-      .join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "inventory-export.csv"; a.click();
-    URL.revokeObjectURL(url);
-  }, [products, selectedIds]);
 
   const hasActiveFilters = searchQuery || selectedCategory || stockFilter !== "all";
 
@@ -270,9 +233,6 @@ export default function InventoryPage() {
               {viewMode === "table" ? (
                 <DataTable
                   products={filtered}
-                  selectedIds={selectedIds}
-                  onToggleSelect={handleToggleSelect}
-                  onToggleSelectAll={handleToggleSelectAll}
                   onAdjustQty={handleAdjustQty}
                   onEdit={handleEdit}
                   onDuplicate={handleDuplicate}
@@ -327,12 +287,10 @@ export default function InventoryPage() {
               <ProductCard
                 key={p.id}
                 product={p}
-                isSelected={selectedIds.has(p.id)}
                 onEdit={handleEdit}
                 onAdjustQty={handleAdjustQty}
                 onDuplicate={handleDuplicate}
                 onDelete={handleDelete}
-                onSelect={handleToggleSelect}
                 onViewHistory={handleViewHistory}
                 onPrintBarcode={handlePrintBarcode}
               />
@@ -380,8 +338,6 @@ export default function InventoryPage() {
             </motion.div>
           )}
 
-          {/* Bottom padding for floating action bar */}
-          {selectedIds.size > 0 && <div className="h-20" />}
         </div>
       )}
 
@@ -428,9 +384,6 @@ export default function InventoryPage() {
           )}
         </motion.div>
       )}
-
-      {/* Floating bulk action bar (mobile) */}
-      {isMobile && <QuickActionBar selectedCount={selectedIds.size} onClearSelection={() => setSelectedIds(new Set())} onBulkDelete={handleBulkDelete} onBulkExport={handleBulkExport} />}
 
       <AddInventoryDialog isOpen={modalOpen} onClose={() => { setModalOpen(false); setEditProduct(null); }} locale={locale} onSave={handleSave} initialData={editProduct} />
       <ProductHistoryPanel product={historyProduct} isOpen={historyOpen} onClose={() => { setHistoryOpen(false); setHistoryProduct(null); }} />

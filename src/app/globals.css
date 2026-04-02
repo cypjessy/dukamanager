@@ -21,6 +21,82 @@
     color-scheme: dark;
   }
 
+  /* Dark mode body background */
+  html.dark body {
+    background-color: #0D0D12;
+    color: #B4B4C7;
+  }
+
+  /* Dark mode specific component backgrounds */
+  html.dark .bg-warm-50 { background-color: #16161F; }
+  html.dark .bg-warm-100 { background-color: #1E1E2D; }
+  html.dark .bg-warm-200 { background-color: #252536; }
+  html.dark .bg-warm-300 { background-color: #2D2D42; }
+  html.dark .bg-warm-800 { background-color: #16161F; }
+  html.dark .bg-warm-900 { background-color: #0D0D12; }
+  html.dark .bg-warm-950 { background-color: #0D0D12; }
+
+  /* Dark mode backgrounds with alpha for glass effects */
+  html.dark .bg-white\/60 { background-color: rgba(22, 22, 31, 0.6); }
+  html.dark .bg-white\/70 { background-color: rgba(22, 22, 31, 0.7); }
+  html.dark .bg-white\/80 { background-color: rgba(22, 22, 31, 0.8); }
+  html.dark .bg-white\/85 { background-color: rgba(22, 22, 31, 0.85); }
+  html.dark .bg-white\/90 { background-color: rgba(22, 22, 31, 0.9); }
+  html.dark .bg-white\/95 { background-color: rgba(22, 22, 31, 0.95); }
+  html.dark .bg-white { background-color: #16161F; }
+
+  /* Dark mode border colors */
+  html.dark .border-warm-200\/60 { border-color: rgba(255, 255, 255, 0.08); }
+  html.dark .border-warm-200\/80 { border-color: rgba(255, 255, 255, 0.1); }
+  html.dark .border-warm-300 { border-color: #252536; }
+  html.dark .border-white\/10 { border-color: rgba(255, 255, 255, 0.1); }
+  html.dark .border-white\/20 { border-color: rgba(255, 255, 255, 0.15); }
+
+  /* Dark mode text colors */
+  html.dark .text-warm-900 { color: #FFFFFF; }
+  html.dark .text-warm-800 { color: #E5E5E5; }
+  html.dark .text-warm-700 { color: #D4D4D4; }
+  html.dark .text-warm-600 { color: #B4B4C7; }
+  html.dark .text-warm-500 { color: #8B8B9B; }
+  html.dark .text-warm-400 { color: #6B6B7B; }
+
+  /* Dark mode scrollbar styling */
+  html.dark .scroll-container::-webkit-scrollbar-thumb {
+    background: #252536;
+  }
+
+  html.dark .scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #2D2D42;
+  }
+
+  /* Dark mode input autofill */
+  html.dark input:-webkit-autofill,
+  html.dark input:-webkit-autofill:hover,
+  html.dark input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #1E1E2D inset;
+    box-shadow: 0 0 0 1000px #1E1E2D inset;
+    -webkit-text-fill-color: #FFFFFF;
+    caret-color: #FFFFFF;
+  }
+
+  /* Dark mode selection */
+  html.dark ::selection {
+    background: rgba(199, 91, 57, 0.3);
+    color: #FFFFFF;
+  }
+
+  /* Dark mode focus visible */
+  html.dark :focus-visible {
+    outline-color: #D4714F;
+  }
+
+  /* Dark mode glass card */
+  html.dark .glass-card {
+    background: rgba(22, 22, 31, 0.85);
+    border-color: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+  }
+
   /* ===== DESKTOP (>=1024px): Strict viewport containment ===== */
   html.is-desktop body {
     overflow: hidden;

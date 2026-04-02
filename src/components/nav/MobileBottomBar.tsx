@@ -9,10 +9,10 @@ import { mobilePrimaryNav, mobileMoreItems, desktopNavItems } from "@/lib/navDat
 
 interface MobileBottomBarProps {
   locale: Locale;
-  onOpenQuickActions: () => void;
+  onOpenQuickActions?: () => void;
 }
 
-export default function MobileBottomBar({ locale, onOpenQuickActions }: MobileBottomBarProps) {
+export default function MobileBottomBar({ locale }: MobileBottomBarProps) {
   const pathname = usePathname();
   const [showMore, setShowMore] = useState(false);
   const [quickMenuOpen, setQuickMenuOpen] = useState(false);
@@ -48,15 +48,7 @@ export default function MobileBottomBar({ locale, onOpenQuickActions }: MobileBo
               return (
                 <button
                   key="quick"
-                  onClick={() => { onOpenQuickActions(); setQuickMenuOpen(!quickMenuOpen); }}
-                  onPointerDown={() => {
-                    const start = Date.now();
-                    const timer = setTimeout(() => {
-                      if (Date.now() - start > 500) setQuickMenuOpen(true);
-                    }, 500);
-                    const up = () => { clearTimeout(timer); window.removeEventListener("pointerup", up); };
-                    window.addEventListener("pointerup", up);
-                  }}
+                  onClick={() => setQuickMenuOpen(!quickMenuOpen)}
                   className="w-14 h-14 -mt-4 rounded-2xl bg-gradient-to-br from-terracotta-500 to-savanna-500 text-white flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all"
                   aria-label={locale === "sw" ? "Vitendo vya Haraka" : "Quick Actions"}
                 >
@@ -202,10 +194,10 @@ export default function MobileBottomBar({ locale, onOpenQuickActions }: MobileBo
               onClick={() => setQuickMenuOpen(false)}
             />
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="md:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-white/95 dark:bg-warm-900/95 backdrop-blur-xl rounded-2xl border border-warm-200/60 dark:border-warm-700/60 shadow-glass-lg p-2 min-w-[200px]"
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="md:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-white/95 dark:bg-warm-900/95 backdrop-blur-xl rounded-2xl border border-warm-200/60 dark:border-warm-700/60 shadow-glass-lg p-2 w-[calc(100%-2rem)] max-w-sm"
             >
               {[
                 { label: { en: "New Sale", sw: "Mauzo Mapya" }, href: "/dashboard/sales" },

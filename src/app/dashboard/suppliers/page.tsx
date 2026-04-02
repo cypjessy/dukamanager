@@ -99,25 +99,39 @@ export default function SuppliersPage() {
         </div>
       </motion.div>
 
-      <div className={`flex flex-wrap gap-2 ${isMobile ? "mb-4" : "mb-3 page-section-fixed"}`}>
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-warm-100/80 dark:bg-warm-800/80">
-          {(["directory", "analytics", "payments"] as SuppliersView[]).map((v) => (
-            <button key={v} onClick={() => setView(v)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all min-h-[32px] ${view === v ? "bg-white dark:bg-warm-700 shadow-sm text-warm-900 dark:text-warm-50" : "text-warm-500 dark:text-warm-400 hover:text-warm-700"}`}>
-              {v === "directory" ? (locale === "sw" ? "Orodha" : "Directory") : v === "analytics" ? (locale === "sw" ? "Takwimu" : "Analytics") : (locale === "sw" ? "Malipo" : "Payments")}
+      <div className={`flex flex-col gap-2 ${isMobile ? "mb-4" : "mb-3 page-section-fixed"}`}>
+        {/* Main tabs - Directory/Analytics/Payments */}
+        <div className="flex items-stretch gap-1 p-1 rounded-2xl bg-warm-100 dark:bg-warm-800">
+          {([
+            { key: "directory", icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", label: "Directory", labelSw: "Orodha" },
+            { key: "analytics", icon: "M18 20V10M12 20V4M6 20v-6", label: "Analytics", labelSw: "Takwimu" },
+            { key: "payments", icon: "M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", label: "Payments", labelSw: "Malipo" },
+          ] as { key: SuppliersView; icon: string; label: string; labelSw: string }[]).map((tab) => (
+            <button key={tab.key} onClick={() => setView(tab.key)}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] ${
+                view === tab.key
+                  ? "bg-white dark:bg-warm-700 shadow-sm text-warm-900 dark:text-warm-50"
+                  : "text-warm-500 dark:text-warm-400 hover:text-warm-700 dark:hover:text-warm-300"
+              }`}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d={tab.icon} />
+              </svg>
+              <span className="hidden sm:inline">{locale === "sw" ? tab.labelSw : tab.label}</span>
+              <span className="sm:hidden text-xs">{locale === "sw" ? tab.labelSw.slice(0,3) : tab.label.slice(0,3)}</span>
             </button>
           ))}
         </div>
 
+        {/* Category filter - only show for directory */}
         {view === "directory" && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
             <button onClick={() => setCategoryFilter("all")}
-              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors min-h-[28px] ${categoryFilter === "all" ? "bg-terracotta-500 text-white" : "bg-warm-100 dark:bg-warm-800 text-warm-500 dark:text-warm-400"}`}>
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors min-h-[28px] flex-shrink-0 ${categoryFilter === "all" ? "bg-terracotta-500 text-white" : "bg-warm-100 dark:bg-warm-800 text-warm-500 dark:text-warm-400"}`}>
               All
             </button>
             {supplierCategories.map((cat) => (
               <button key={cat.key} onClick={() => setCategoryFilter(cat.key)}
-                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors min-h-[28px] ${categoryFilter === cat.key ? "bg-terracotta-500 text-white" : "bg-warm-100 dark:bg-warm-800 text-warm-500 dark:text-warm-400"}`}>
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors min-h-[28px] flex-shrink-0 ${categoryFilter === cat.key ? "bg-terracotta-500 text-white" : "bg-warm-100 dark:bg-warm-800 text-warm-500 dark:text-warm-400"}`}>
                 {locale === "sw" ? cat.labelSw : cat.label}
               </button>
             ))}

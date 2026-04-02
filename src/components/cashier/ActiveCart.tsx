@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { CartItem } from "@/app/cashier/page";
 
@@ -25,18 +25,109 @@ interface ActiveCartProps {
 }
 
 export default function ActiveCart({ cart, onUpdateQty, onRemove, subtotal, grandTotal, selectedCustomerId, onCustomerChange, onPayment, customers }: ActiveCartProps) {
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowCustomerDropdown(false);
+        setCustomerSearch("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredCustomers = customers.filter((c) =>
+    c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    c.phone.includes(customerSearch)
+  );
 
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Customer selection */}
-      <div className="flex-shrink-0 p-3 pb-2">
-        <select value={selectedCustomerId || ""} onChange={(e) => onCustomerChange(e.target.value || null)}
-          className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-warm-800 border border-warm-200 dark:border-warm-700 text-sm outline-none focus:border-terracotta-500 appearance-none min-h-[44px]"
-          style={{ fontSize: "16px" }}>
-          <option value="">Walk-in Customer</option>
-          {customers.map((c) => <option key={c.id} value={c.id}>{c.name} - {c.phone}</option>)}
-        </select>
+      <div className="flex-shrink-0 p-3 pb-2 relative" ref={dropdownRef}>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => { setShowCustomerDropdown(!showCustomerDropdown); setCustomerSearch(""); }}
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-warm-800 border border-warm-200 dark:border-warm-700 text-sm outline-none focus:border-terracotta-500 min-h-[44px] text-left flex items-center justify-between gap-2"
+          >
+            <span className="truncate">
+              {selectedCustomer ? `${selectedCustomer.name} (${selectedCustomer.phone})` : "Walk-in Customer"}
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 text-warm-400">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <AnimatePresence>
+            {showCustomerDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl bg-white dark:bg-warm-800 border border-warm-200 dark:border-warm-700 shadow-xl overflow-hidden"
+              >
+                <div className="p-2 border-b border-warm-100 dark:border-warm-700">
+                  <div className="relative">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-400">
+                      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                      type="text"
+                      value={customerSearch}
+                      onChange={(e) => setCustomerSearch(e.target.value)}
+                      placeholder="Search name or phone..."
+                      className="w-full pl-8 pr-3 py-2 rounded-lg bg-warm-50 dark:bg-warm-700 border border-warm-200 dark:border-warm-600 text-sm outline-none focus:border-terracotta-500"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+                <div className="max-h-48 overflow-y-auto">
+                  <button
+                    onClick={() => { onCustomerChange(null); setShowCustomerDropdown(false); setCustomerSearch(""); }}
+                    className="w-full text-left px-3 py-2.5 text-sm hover:bg-warm-50 dark:hover:bg-warm-700 transition-colors min-h-[44px] flex items-center gap-2"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-warm-400 flex-shrink-0">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                    </svg>
+                    <span className={!selectedCustomerId ? "font-medium text-terracotta-600 dark:text-terracotta-400" : "text-warm-600 dark:text-warm-300"}>
+                      Walk-in Customer
+                    </span>
+                  </button>
+                  {filteredCustomers.length === 0 && (
+                    <p className="px-3 py-4 text-xs text-warm-400 text-center">No customers found</p>
+                  )}
+                  {filteredCustomers.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => { onCustomerChange(c.id); setShowCustomerDropdown(false); setCustomerSearch(""); }}
+                      className={`w-full text-left px-3 py-2.5 text-sm hover:bg-warm-50 dark:hover:bg-warm-700 transition-colors min-h-[44px] flex items-center gap-2 ${
+                        selectedCustomerId === c.id ? "bg-terracotta-50 dark:bg-terracotta-900/20" : ""
+                      }`}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-warm-400 flex-shrink-0">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                      </svg>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-warm-900 dark:text-warm-50 truncate">{c.name}</p>
+                        <p className="text-[10px] text-warm-400">{c.phone}</p>
+                      </div>
+                      {c.creditLimit > 0 && (
+                        <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-savanna-50 dark:bg-savanna-900/20 text-savanna-600 flex-shrink-0">Credit</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
         {selectedCustomer && selectedCustomer.creditLimit > 0 && (
           <div className="flex items-center gap-2 mt-1.5 px-2 py-1 rounded-lg bg-warm-50 dark:bg-warm-800/50">
             <span className="text-[10px] text-warm-400">Credit:</span>

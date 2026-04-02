@@ -8,12 +8,10 @@ import StockLevelIndicator from "./StockLevelIndicator";
 
 interface ProductCardProps {
   product: Product;
-  isSelected: boolean;
   onEdit: (product: Product) => void;
   onAdjustQty: (id: string, delta: number) => void;
   onDuplicate: (product: Product) => void;
   onDelete: (id: string) => void;
-  onSelect: (id: string) => void;
   onViewHistory: (product: Product) => void;
   onPrintBarcode: (product: Product) => void;
 }
@@ -49,12 +47,10 @@ const categoryColors: Record<string, string> = {
 
 export default function ProductCard({
   product,
-  isSelected,
   onEdit,
   onAdjustQty,
   onDuplicate,
   onDelete,
-  onSelect,
   onViewHistory,
   onPrintBarcode,
 }: ProductCardProps) {
@@ -115,32 +111,18 @@ export default function ProductCard({
       >
         <div className="p-4 bg-white/80 dark:bg-warm-900/80 backdrop-blur-sm rounded-2xl">
           <div className="flex items-start gap-3">
-            <button
-              onClick={(e) => { e.stopPropagation(); onSelect(product.id); }}
-              className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
-                isSelected
-                  ? "bg-terracotta-500 border-terracotta-500 text-white"
-                  : "border-warm-300 dark:border-warm-600 hover:border-terracotta-400"
-              }`}
-              aria-label={`Select ${product.name}`}
-            >
-              {isSelected && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-              )}
-            </button>
-
             <div className="min-w-0 flex-1">
               <div className="flex items-start gap-3">
                 {product.imageUrl && product.imageUrl.length > 5 && !imageError ? (
                   <img
                     src={product.imageUrl}
                     alt={product.name}
-                    className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-warm-200/60 dark:border-warm-700/60"
+                    className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-warm-200/60 dark:border-warm-700/60"
                     onError={() => setImageError(true)}
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-warm-100 to-warm-200 dark:from-warm-800 dark:to-warm-700 flex items-center justify-center flex-shrink-0 border border-warm-200/60 dark:border-warm-700/60">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-warm-400">
+                  <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-warm-100 to-warm-200 dark:from-warm-800 dark:to-warm-700 flex items-center justify-center flex-shrink-0 border border-warm-200/60 dark:border-warm-700/60">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-warm-400">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                       <circle cx="12" cy="13" r="4" />
                     </svg>

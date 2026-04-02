@@ -15,7 +15,7 @@ const DEFAULT_POLICY = {
   restockExpired: false,
 };
 
-export function useRefundValidation(supervisorPin?: string) {
+export function useRefundValidation(supervisorPin?: string, skipPinValidation?: boolean) {
   const [analytics, setAnalytics] = useState<RefundAnalytics>({
     totalReturns: 0,
     totalRefundAmount: 0,
@@ -72,11 +72,13 @@ export function useRefundValidation(supervisorPin?: string) {
     }
 
     // Check supervisor PIN
-    const effectivePin = supervisorPin || "1234";
-    if (DEFAULT_POLICY.supervisorPinRequired && !inputPin) {
-      errors.push("Supervisor PIN required");
-    } else if (DEFAULT_POLICY.supervisorPinRequired && inputPin !== effectivePin) {
-      errors.push("Invalid supervisor PIN");
+    if (!skipPinValidation) {
+      const effectivePin = supervisorPin || "1234";
+      if (DEFAULT_POLICY.supervisorPinRequired && !inputPin) {
+        errors.push("Supervisor PIN required");
+      } else if (DEFAULT_POLICY.supervisorPinRequired && inputPin !== effectivePin) {
+        errors.push("Invalid supervisor PIN");
+      }
     }
 
     // Expiry warning
@@ -96,7 +98,7 @@ export function useRefundValidation(supervisorPin?: string) {
     }
 
     return { isValid: errors.length === 0, errors, warnings };
-  }, []);
+  }, [skipPinValidation, supervisorPin]);
 
   const createRefundRequest = useCallback((
     transaction: Transaction,
@@ -105,7 +107,8 @@ export function useRefundValidation(supervisorPin?: string) {
     condition: ReturnCondition,
     refundMethod: RefundMethod,
     reason: string,
-    supervisorPin: string
+    supervisorPin: string,
+    isAdminOverride?: boolean
   ): RefundRequest => {
     const selectedItems = items.filter((i) => i.selected);
     const refundAmount = selectedItems.reduce((s, i) => s + i.totalRefund, 0);
@@ -124,7 +127,7 @@ export function useRefundValidation(supervisorPin?: string) {
       refundMethod,
       refundAmount,
       supervisorPin,
-      status: DEFAULT_POLICY.supervisorPinRequired ? "pending" : "approved",
+      status: isAdminOverride ? "approved" : (DEFAULT_POLICY.supervisorPinRequired ? "pending" : "approved"),
       createdAt: new Date().toISOString(),
       processedAt: "",
       processedBy: "",

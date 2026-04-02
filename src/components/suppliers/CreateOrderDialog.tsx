@@ -7,6 +7,28 @@ import { suppliers, supplierProducts, paymentTermLabels } from "@/data/supplierD
 import { useResponsiveDialog } from "@/hooks/useResponsiveDialog";
 import Button from "@/components/ui/Button";
 
+async function sendSupplierOrderSMS(supplierPhone: string, orderRef: string, items: CartItem[], total: number, deliveryDate: string, shopName: string) {
+  const itemList = items.map(i => `${i.name} x${i.qty}`).join(", ");
+  const message = `ORDER CONFIRMATION - ${shopName}
+Order Ref: ${orderRef}
+Items: ${itemList}
+Total: KSh ${total.toLocaleString()}
+Delivery: ${deliveryDate}
+Thank you!`;
+
+  try {
+    const res = await fetch("/api/sms", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to: supplierPhone, message, type: "default" }),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error("Failed to send SMS:", error);
+    return false;
+  }
+}
+
 interface CreateOrderDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -125,10 +147,20 @@ export default function CreateOrderDialog({ isOpen, onClose, initialSupplier, on
   }, [step]);
 
   const handleSubmit = useCallback(async () => {
+    if (!selectedSupplier) return;
     setIsSubmitting(true);
     setSmsStatus("sending");
-    await new Promise((r) => setTimeout(r, 1500));
-    setSmsStatus("sent");
+
+    try {
+      const shopName = "DukaManager";
+      const supplierPhone = selectedSupplier.phone;
+      await sendSupplierOrderSMS(supplierPhone, orderRef, items, total, deliveryDate, shopName);
+      setSmsStatus("sent");
+    } catch (error) {
+      console.error("Failed to send SMS:", error);
+      setSmsStatus("failed");
+    }
+
     onSubmit({ supplierId: selectedSupplierId, items, transportCost, total, deliveryDate, paymentMethod, notes, orderRef });
     setIsSubmitting(false);
     setSubmitSuccess(true);
@@ -139,7 +171,7 @@ export default function CreateOrderDialog({ isOpen, onClose, initialSupplier, on
       setSelectedSupplierId("");
       onClose();
     }, 2000);
-  }, [selectedSupplierId, items, transportCost, total, deliveryDate, paymentMethod, notes, orderRef, onSubmit, onClose]);
+  }, [selectedSupplier, selectedSupplierId, items, transportCost, total, deliveryDate, paymentMethod, notes, orderRef, onSubmit, onClose]);
 
   const handleClose = useCallback(() => {
     if (!isSubmitting) {

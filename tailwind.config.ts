@@ -18,6 +18,17 @@ const config: Config = {
     },
     extend: {
       colors: {
+        obsidian: {
+          DEFAULT: "#0D0D12",
+          50: "#1E1E2D",
+          100: "#16161F",
+          200: "#1E1E2D",
+          300: "#252536",
+          400: "#2D2D42",
+          500: "#6B6B7B",
+          600: "#B4B4C7",
+          700: "#FFFFFF",
+        },
         terracotta: {
           50: "#fdf2ee",
           100: "#fbe2d8",
@@ -25,8 +36,8 @@ const config: Config = {
           300: "#ef9a7e",
           400: "#e67a5a",
           500: "#C75B39",
-          600: "#b34a2e",
-          700: "#953b26",
+          600: "#D4714F",
+          700: "#b34a2e",
           800: "#7a3223",
           900: "#652c21",
         },
@@ -49,8 +60,8 @@ const config: Config = {
           300: "#8ec698",
           400: "#5ea86e",
           500: "#2D5A3D",
-          600: "#264d34",
-          700: "#203f2c",
+          600: "#00D9A5",
+          700: "#264d34",
           800: "#1c3325",
           900: "#182b20",
         },
@@ -61,8 +72,8 @@ const config: Config = {
           300: "#ffa471",
           400: "#E85D04",
           500: "#d45200",
-          600: "#b54200",
-          700: "#8f3400",
+          600: "#FFB800",
+          700: "#b54200",
           800: "#742c04",
           900: "#622708",
         },
@@ -77,6 +88,12 @@ const config: Config = {
           700: "#56524b",
           800: "#494641",
           900: "#3f3d39",
+          950: "#0D0D12",
+        },
+        slate: {
+          850: "#1E1E2D",
+          900: "#16161F",
+          950: "#0D0D12",
         },
       },
       fontFamily: {
@@ -109,6 +126,14 @@ const config: Config = {
         "btn-hover":
           "0 8px 24px rgba(199, 91, 57, 0.25), 0 4px 8px rgba(0, 0, 0, 0.1)",
         error: "0 0 0 3px rgba(220, 38, 38, 0.2)",
+        "dark-card": "0 4px 24px rgba(0,0,0,0.3)",
+        "dark-card-hover": "0 8px 32px rgba(199,91,57,0.15)",
+        "glow-terracotta": "0 0 40px rgba(199,91,57,0.2)",
+      },
+      backgroundImage: {
+        "gradient-dark": "linear-gradient(135deg, #0D0D12 0%, #16161F 100%)",
+        "glass-dark": "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
+        "card-hover-dark": "linear-gradient(135deg, rgba(199,91,57,0.1) 0%, rgba(212,165,116,0.05) 100%)",
       },
       animation: {
         "gradient-drift": "gradient-drift 15s ease infinite",

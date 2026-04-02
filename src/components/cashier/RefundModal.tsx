@@ -13,10 +13,11 @@ interface RefundModalProps {
   recentSales: Transaction[];
   products: Array<{ id: string; name: string; stock: number; sku?: string; sellingPrice?: number }>;
   shopSupervisorPin?: string;
+  skipPinValidation?: boolean;
 }
 
-export default function RefundModal({ isOpen, onClose, onRefundComplete, recentSales, products, shopSupervisorPin }: RefundModalProps) {
-  const { validateReturn, createRefundRequest, updateAnalytics } = useRefundValidation(shopSupervisorPin);
+export default function RefundModal({ isOpen, onClose, onRefundComplete, recentSales, products, shopSupervisorPin, skipPinValidation }: RefundModalProps) {
+  const { validateReturn, createRefundRequest, updateAnalytics } = useRefundValidation(shopSupervisorPin, skipPinValidation);
   const [step, setStep] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
@@ -125,7 +126,8 @@ export default function RefundModal({ isOpen, onClose, onRefundComplete, recentS
         condition as ReturnCondition,
         refundMethod,
         reason,
-        supervisorPin
+        supervisorPin,
+        skipPinValidation
       );
 
       const selectedItems = refundItems.filter((i) => i.selected);
@@ -190,7 +192,7 @@ export default function RefundModal({ isOpen, onClose, onRefundComplete, recentS
                     </div>
                     <div>
                       <h2 className="font-heading font-bold text-base text-warm-900 dark:text-warm-50">Rejesha / Return</h2>
-                      <p className="text-[10px] text-warm-400">Step {step} of 4</p>
+                      <p className="text-[10px] text-warm-400">Step {step} of {skipPinValidation ? 3 : 4}</p>
                     </div>
                   </div>
                   <button
@@ -206,7 +208,7 @@ export default function RefundModal({ isOpen, onClose, onRefundComplete, recentS
 
                 {/* Progress bar */}
                 <div className="flex items-center gap-1.5 mt-3">
-                  {[1, 2, 3, 4].map((s) => (
+                  {(skipPinValidation ? [1, 2, 3] : [1, 2, 3, 4]).map((s) => (
                     <div
                       key={s}
                       className={`flex-1 h-1 rounded-full transition-colors ${
@@ -668,7 +670,7 @@ export default function RefundModal({ isOpen, onClose, onRefundComplete, recentS
                       Back
                     </button>
                   )}
-                  {step < 4 && (
+                  {step < 4 && !(skipPinValidation && step === 3) && (
                     <button
                       onClick={() => setStep((s) => s + 1)}
                       disabled={step === 1 ? !selectedTransaction : step === 2 ? selectedRefundItems.length === 0 || !condition : false}
@@ -677,7 +679,7 @@ export default function RefundModal({ isOpen, onClose, onRefundComplete, recentS
                       Continue
                     </button>
                   )}
-                  {step === 4 && (
+                  {(step === 4 || (skipPinValidation && step === 3)) && (
                     <button
                       onClick={handleValidateAndProcess}
                       className="flex-1 py-3 rounded-xl bg-gradient-to-r from-terracotta-500 to-savanna-500 text-white font-heading font-bold text-sm min-h-[48px] active:scale-[0.98] transition-transform shadow-md shadow-terracotta-500/20"

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale } from "@/types";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   locale: Locale;
@@ -63,14 +64,14 @@ export default function DeveloperSidebar({ locale, expanded, onToggleExpanded, o
 
   return (
     <motion.aside
-      className={`fixed left-0 top-0 h-full bg-white/80 dark:bg-warm-900/80 backdrop-blur-xl border-r border-warm-200/60 dark:border-warm-700/60 z-40 flex flex-col transition-all duration-200 ${expanded ? "w-64" : "w-[72px]"}`}
+      className={`fixed left-0 top-0 h-full bg-white/80 backdrop-blur-xl border-r border-warm-200/60 z-40 flex flex-col transition-all duration-200 ${expanded ? "w-64" : "w-[72px]"}`}
       animate={{ width: expanded ? 256 : 72 }}
       transition={{ duration: 0.2 }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       {/* Logo */}
-      <div className="flex items-center h-14 px-4 border-b border-warm-200/60 dark:border-warm-700/60">
+      <div className="flex items-center h-14 px-4 border-b border-warm-200/60">
         <button onClick={onToggleExpanded} className="flex items-center gap-2 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-terracotta-500 to-savanna-500 flex items-center justify-center flex-shrink-0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
@@ -85,7 +86,7 @@ export default function DeveloperSidebar({ locale, expanded, onToggleExpanded, o
                 exit={{ opacity: 0, width: 0 }}
                 className="overflow-hidden"
               >
-                <span className="font-heading font-extrabold text-sm text-warm-900 dark:text-warm-50 whitespace-nowrap">
+                <span className="font-heading font-extrabold text-sm text-warm-900 whitespace-nowrap">
                   Duka<span className="text-terracotta-500">Manager</span>
                 </span>
                 <span className="text-[9px] text-warm-400 ml-1 font-medium">Dev</span>
@@ -105,8 +106,8 @@ export default function DeveloperSidebar({ locale, expanded, onToggleExpanded, o
               href={item.href}
               className={`flex items-center gap-3 rounded-xl transition-colors min-h-[44px] ${
                 isActive
-                  ? "bg-terracotta-50 dark:bg-terracotta-900/20 text-terracotta-600 dark:text-terracotta-400"
-                  : "text-warm-500 hover:bg-warm-50 dark:hover:bg-warm-800/50 hover:text-warm-700 dark:hover:text-warm-300"
+                  ? "bg-terracotta-50 text-terracotta-600"
+                  : "text-warm-500 hover:bg-warm-50 hover:text-warm-700"
               } ${expanded ? "px-3" : "justify-center px-1"}`}
             >
               <span className="flex-shrink-0">{item.icon}</span>
@@ -122,21 +123,21 @@ export default function DeveloperSidebar({ locale, expanded, onToggleExpanded, o
       </nav>
 
       {/* User Section */}
-      <div className="p-3 border-t border-warm-200/60 dark:border-warm-700/60">
+      <div className="p-3 border-t border-warm-200/60">
         {expanded ? (
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-terracotta-500 to-savanna-500 flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-[10px]">{userName.slice(0, 2).toUpperCase()}</span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-warm-900 dark:text-warm-50 truncate">{userName}</p>
+              <p className="text-xs font-semibold text-warm-900 truncate">{userName}</p>
               <p className="text-[9px] text-warm-400 capitalize">{userRole}</p>
             </div>
           </div>
         ) : null}
         <button
           onClick={onLogout}
-          className={`flex items-center gap-3 w-full rounded-xl text-warm-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors min-h-[40px] ${expanded ? "px-3" : "justify-center px-1"}`}
+          className={`flex items-center gap-3 w-full rounded-xl text-warm-400 hover:text-red-500 hover:bg-red-50 transition-colors min-h-[40px] ${expanded ? "px-3" : "justify-center px-1"}`}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />

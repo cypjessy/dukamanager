@@ -26,6 +26,7 @@ import CartRecoveryDialog from "@/components/cashier/CartRecoveryDialog";
 import AutoSaveIndicator from "@/components/cashier/AutoSaveIndicator";
 import RefundModal from "@/components/cashier/RefundModal";
 import RefundWorkflow from "@/components/cashier/RefundWorkflow";
+import SupervisorPinSetup from "@/components/cashier/SupervisorPinSetup";
 import OfflineBanner from "@/components/cashier/OfflineBanner";
 import SyncBadge from "@/components/cashier/SyncBadge";
 import SyncProgressModal from "@/components/cashier/SyncProgressModal";
@@ -663,13 +664,13 @@ function CashierPortalInner() {
           </div>
           <button
             onClick={toggleLocale}
-            className="w-7 h-7 sm:w-auto sm:h-auto sm:px-2 sm:py-1 rounded-lg text-[10px] font-bold bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 min-h-[28px] flex items-center justify-center"
+            className="w-7 h-7 sm:w-auto sm:h-auto sm:px-2 sm:py-1 rounded-lg text-[10px] font-bold bg-warm-100 text-warm-600 min-h-[28px] flex items-center justify-center"
           >
             {locale === "en" ? "SW" : "EN"}
           </button>
 
           {/* Cashier name + logout */}
-          <div className="flex items-center gap-1.5 pl-1.5 sm:pl-2 border-l border-warm-200 dark:border-warm-700">
+          <div className="flex items-center gap-1.5 pl-1.5 sm:pl-2 border-l border-warm-200">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-terracotta-500 to-savanna-500 flex items-center justify-center">
               <span className="text-white font-bold text-[9px]">
                 {(profile?.displayName || profile?.email || "C").slice(0, 2).toUpperCase()}
@@ -733,6 +734,10 @@ function CashierPortalInner() {
           {/* Refund workflow in tools panel */}
           <div className="flex-shrink-0 p-3 border-t border-warm-200/60 dark:border-warm-700/60">
             <RefundWorkflow locale={locale} onOpenRefund={() => setShowRefundModal(true)} />
+          </div>
+          {/* Supervisor PIN setup */}
+          <div className="flex-shrink-0 p-3 border-t border-warm-200/60 dark:border-warm-700/60">
+            <SupervisorPinSetup locale={locale} />
           </div>
           {/* AI Assistant */}
           <AIAssistantPanel
@@ -822,6 +827,9 @@ function CashierPortalInner() {
               />
               <div className="flex-shrink-0 p-3 border-t border-warm-200/60 dark:border-warm-700/60">
                 <RefundWorkflow locale={locale} onOpenRefund={() => setShowRefundModal(true)} />
+              </div>
+              <div className="flex-shrink-0 p-3 border-t border-warm-200/60 dark:border-warm-700/60">
+                <SupervisorPinSetup locale={locale} />
               </div>
               <AIAssistantPanel
                 suggestions={aiSuggestions}

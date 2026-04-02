@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import type { Product } from "@/data/inventoryData";
 import { getStockStatus, getProfitMargin, getDaysUntilStockout, suppliers } from "@/data/inventoryData";
 import StockLevelIndicator from "./StockLevelIndicator";
@@ -27,9 +27,6 @@ function ProductImageCell({ product }: { product: Product }) {
 
 interface DataTableProps {
   products: Product[];
-  selectedIds: Set<string>;
-  onToggleSelect: (id: string) => void;
-  onToggleSelectAll: () => void;
   onAdjustQty: (id: string, delta: number) => void;
   onEdit: (product: Product) => void;
   onDuplicate: (product: Product) => void;
@@ -59,9 +56,6 @@ const categoryColors: Record<string, string> = {
 
 export default function DataTable({
   products,
-  selectedIds,
-  onToggleSelect,
-  onToggleSelectAll,
   onAdjustQty,
   onEdit,
   onDuplicate,
@@ -74,7 +68,7 @@ export default function DataTable({
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     if (!searchQuery) return products;
@@ -105,7 +99,6 @@ export default function DataTable({
 
   const totalPages = Math.ceil(sorted.length / pageSize);
   const paginated = sorted.slice((page - 1) * pageSize, page * pageSize);
-  const allSelected = paginated.length > 0 && paginated.every((p) => selectedIds.has(p.id));
 
   const toggleSort = useCallback((field: SortField) => {
     if (sortField === field) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -113,14 +106,11 @@ export default function DataTable({
   }, [sortField]);
 
   return (
-    <div>
-      <div className="overflow-x-auto rounded-2xl border border-warm-200/60 dark:border-warm-700/60" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
+    <div className="overflow-visible rounded-2xl border border-warm-200/60 dark:border-warm-700/60" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
+      <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="sticky top-0 z-10">
             <tr className="border-b border-warm-200/60 dark:border-warm-700/60" style={{ background: "rgba(245,245,240,0.95)", backdropFilter: "blur(12px)" }}>
-              <th className="px-3 py-3 w-10">
-                <input type="checkbox" checked={allSelected} onChange={onToggleSelectAll} className="rounded accent-terracotta-500" aria-label="Select all" />
-              </th>
               <SortHeader field="name" label="Product" sortField={sortField} sortDir={sortDir} onSort={toggleSort} />
               <SortHeader field="category" label="Category" sortField={sortField} sortDir={sortDir} onSort={toggleSort} />
               <SortHeader field="quantity" label="Stock" sortField={sortField} sortDir={sortDir} onSort={toggleSort} />
@@ -136,25 +126,19 @@ export default function DataTable({
               const status = getStockStatus(p);
               const margin = getProfitMargin(p);
               const sup = suppliers.find((s) => s.id === p.supplierId);
-              const isSelected = selectedIds.has(p.id);
               const daysLeft = getDaysUntilStockout(p);
-              const isMenuOpen = openMenuId === p.id;
+              const isExpanded = expandedRowId === p.id;
 
               return (
+                <>
                 <motion.tr
                   key={p.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.015 }}
-                  className={`border-b border-warm-100/60 dark:border-warm-800/60 last:border-0 transition-colors group ${
-                    isSelected
-                      ? "bg-terracotta-50/50 dark:bg-terracotta-900/15"
-                      : "hover:bg-terracotta-50/20 dark:hover:bg-terracotta-900/8"
-                  }`}
+                  className="border-b border-warm-100/60 dark:border-warm-800/60 last:border-0 transition-colors group hover:bg-terracotta-50/20 dark:hover:bg-terracotta-900/8 cursor-pointer"
+                  onClick={() => setExpandedRowId(isExpanded ? null : p.id)}
                 >
-                  <td className="px-3 py-2.5">
-                    <input type="checkbox" checked={isSelected} onChange={() => onToggleSelect(p.id)} className="rounded accent-terracotta-500" aria-label={`Select ${p.name}`} />
-                  </td>
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-2.5">
                       <ProductImageCell product={p} />
@@ -207,60 +191,74 @@ export default function DataTable({
                   <td className="px-3 py-2.5 relative">
                     <div className="flex items-center gap-0.5">
                       <button
-                        onClick={() => onEdit(p)}
+                        onClick={(e) => { e.stopPropagation(); onEdit(p); }}
                         className="p-1.5 rounded-lg hover:bg-terracotta-50 dark:hover:bg-terracotta-900/20 text-warm-400 hover:text-terracotta-500 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center"
                         aria-label="Edit"
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                       </button>
-                      <div className="relative">
-                        <button
-                          onClick={() => setOpenMenuId(isMenuOpen ? null : p.id)}
-                          className="p-1.5 rounded-lg hover:bg-warm-100 dark:hover:bg-warm-800 text-warm-400 hover:text-warm-600 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center"
-                          aria-label="More actions"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" /></svg>
-                        </button>
-                        <AnimatePresence>
-                          {isMenuOpen && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.9, y: -4 }}
-                              animate={{ opacity: 1, scale: 1, y: 0 }}
-                              exit={{ opacity: 0, scale: 0.9, y: -4 }}
-                              transition={{ duration: 0.12 }}
-                              className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-warm-800 rounded-xl shadow-xl border border-warm-200/60 dark:border-warm-700/60 py-1 z-20 overflow-hidden"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {[
-                                { label: "Duplicate", icon: "M8 16H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2m-6 12h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z", action: () => { onDuplicate(p); setOpenMenuId(null); } },
-                                { label: "View History", icon: "M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", action: () => { onViewHistory(p); setOpenMenuId(null); } },
-                                { label: "Print Barcode", icon: "M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2m2 4h6a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2zm8-12V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v4h10z", action: () => { onPrintBarcode(p); setOpenMenuId(null); } },
-                                { label: "Delete", icon: "M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16", action: () => { onDelete(p.id); setOpenMenuId(null); }, danger: true },
-                              ].map((item) => (
-                                <button
-                                  key={item.label}
-                                  onClick={item.action}
-                                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
-                                    item.danger
-                                      ? "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                      : "text-warm-600 dark:text-warm-300 hover:bg-warm-50 dark:hover:bg-warm-700"
-                                  }`}
-                                >
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon} /></svg>
-                                  {item.label}
-                                </button>
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setExpandedRowId(isExpanded ? null : p.id); }}
+                        className={`p-1.5 rounded-lg transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center ${
+                          isExpanded ? "bg-terracotta-100 dark:bg-terracotta-900/30 text-terracotta-600" : "hover:bg-warm-100 dark:hover:bg-warm-800 text-warm-400 hover:text-warm-600"
+                        }`}
+                        aria-label="More actions"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={isExpanded ? "rotate-180" : ""}>
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </button>
                     </div>
                   </td>
                 </motion.tr>
+
+                {/* Expanded row with actions */}
+                {isExpanded && (
+                  <motion.tr
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="bg-warm-50 dark:bg-warm-800/30"
+                  >
+                    <td colSpan={8} className="px-3 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => { onDuplicate(p); setExpandedRowId(null); }}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 text-xs font-medium hover:bg-warm-200 dark:hover:bg-warm-600 transition-colors"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                          Duplicate
+                        </button>
+                        <button
+                          onClick={() => { onViewHistory(p); setExpandedRowId(null); }}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 text-xs font-medium hover:bg-warm-200 dark:hover:bg-warm-600 transition-colors"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                          View History
+                        </button>
+                        <button
+                          onClick={() => { onPrintBarcode(p); setExpandedRowId(null); }}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 text-xs font-medium hover:bg-warm-200 dark:hover:bg-warm-600 transition-colors"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M6 8v8M10 8v8M14 8v4M18 8v8" /></svg>
+                          Print Barcode
+                        </button>
+                        <button
+                          onClick={() => { onDelete(p.id); setExpandedRowId(null); }}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                )}
+                </>
               );
             })}
             {paginated.length === 0 && (
-              <tr><td colSpan={9} className="px-4 py-12 text-center text-warm-400">No products found</td></tr>
+              <tr><td colSpan={8} className="px-4 py-12 text-center text-warm-400">No products found</td></tr>
             )}
           </tbody>
         </table>

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/providers/LocaleProvider";
 import { useAuth } from "@/providers/AuthProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { getStockStatus } from "@/data/inventoryData";
 import { useProducts } from "@/hooks/useProducts";
 import { useAdminPOS } from "@/hooks/useAdminPOS";
@@ -620,14 +621,14 @@ function AdminPOSInner() {
           </div>
           <button
             onClick={toggleLocale}
-            className="w-7 h-7 sm:w-auto sm:h-auto sm:px-2 sm:py-1 rounded-lg text-[10px] font-bold bg-warm-100 dark:bg-warm-700 text-warm-600 dark:text-warm-300 min-h-[28px] flex items-center justify-center"
+            className="w-7 h-7 sm:w-auto sm:h-auto sm:px-2 sm:py-1 rounded-lg text-[10px] font-bold bg-warm-100 text-warm-600 min-h-[28px] flex items-center justify-center"
           >
             {locale === "en" ? "SW" : "EN"}
           </button>
           <button
             onClick={() => router.push("/dashboard")}
             title={t("Back to Dashboard", "Rudi kwenye Dashibodi")}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-warm-400 hover:text-terracotta-500 hover:bg-terracotta-50 dark:hover:bg-terracotta-900/20 transition-colors"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-warm-400 hover:text-terracotta-500 hover:bg-terracotta-50 transition-colors"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -786,14 +787,14 @@ function AdminPOSInner() {
         </div>
         {/* Bottom tab bar */}
         <div
-          className="flex-shrink-0 bg-white dark:bg-warm-800 border-t border-warm-200/60 dark:border-warm-700/60 flex items-center justify-around z-30"
+          className="flex-shrink-0 w-full bg-white dark:bg-warm-800 border-t border-warm-200/60 dark:border-warm-700/60 flex items-center justify-around z-30"
           style={{ paddingBottom: "max(4px, env(safe-area-inset-bottom))", minHeight: "56px" }}
         >
           {(["products", "cart", "tools"] as ActiveTab[]).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-all min-w-[64px] relative ${
+              className={`flex flex-col items-center gap-0.5 px-1 py-1.5 rounded-xl transition-all min-w-0 flex-1 relative ${
                 activeTab === tab
                   ? "text-terracotta-600"
                   : "text-warm-400"
@@ -848,7 +849,7 @@ function AdminPOSInner() {
                   </div>
                 )}
               </span>
-              <span className="relative z-10 text-[10px] font-semibold capitalize">
+              <span className="relative z-10 text-[10px] font-semibold capitalize max-w-[60px] truncate leading-tight">
                 {tab === "cart"
                   ? t("Cart", "Kikapu") + (cart.length > 0 ? ` (${cart.length})` : "")
                   : tab === "tools"
@@ -918,6 +919,7 @@ function AdminPOSInner() {
         recentSales={recentSales}
         products={refundProducts}
         shopSupervisorPin={supervisorPinValue ?? undefined}
+        skipPinValidation
       />
 
       {/* Sync Progress Modal */}

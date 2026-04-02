@@ -8,6 +8,7 @@ import { z } from "zod";
 import type { Locale } from "@/types";
 import { dt } from "@/lib/dashboardTranslations";
 import { KENYAN_CATEGORIES } from "@/data/sampleData";
+import { useSuppliersFirestore } from "@/hooks/useSuppliersFirestore";
 import FloatingInput from "@/components/ui/FloatingInput";
 import Button from "@/components/ui/Button";
 
@@ -42,13 +43,24 @@ export default function QuickAddProduct({
 }: QuickAddProductProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false);
+  const [supplierSearch, setSupplierSearch] = useState("");
   const dialogRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const supplierDropdownRef = useRef<HTMLDivElement>(null);
+
+  const { suppliers } = useSuppliersFirestore();
+
+  const filteredSuppliers = suppliers.filter((s) =>
+    s.isActive && s.name.toLowerCase().includes(supplierSearch.toLowerCase())
+  );
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema) as never,
@@ -62,14 +74,29 @@ export default function QuickAddProduct({
     },
   });
 
+  const watchSupplier = watch("supplier");
+
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => firstInputRef.current?.focus(), 100);
     } else {
       reset();
       setIsSuccess(false);
+      setShowSupplierDropdown(false);
+      setSupplierSearch("");
     }
   }, [isOpen, reset]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (supplierDropdownRef.current && !supplierDropdownRef.current.contains(e.target as Node)) {
+        setShowSupplierDropdown(false);
+        setSupplierSearch("");
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     function handleEscape(e: KeyboardEvent) {
@@ -202,11 +229,77 @@ export default function QuickAddProduct({
                   type="number"
                   error={errors.sellingPrice?.message}
                 />
-                <FloatingInput
-                  {...register("supplier")}
-                  label={dt("supplier", locale)}
-                  type="text"
-                />
+                <div className="relative" ref={supplierDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => { setShowSupplierDropdown(!showSupplierDropdown); setSupplierSearch(""); }}
+                    className={`w-full rounded-xl border-2 bg-white/80 dark:bg-warm-800/80 backdrop-blur-sm py-3.5 px-4 text-sm transition-all duration-200 outline-none min-h-[48px] text-left flex items-center justify-between gap-2 ${
+                      errors.supplier
+                        ? "border-red-400"
+                        : "border-warm-200 dark:border-warm-600 focus:border-terracotta-500"
+                    }`}
+                  >
+                    <span className={`truncate ${!watchSupplier ? "text-warm-400" : "text-warm-900 dark:text-warm-100"}`}>
+                      {watchSupplier || dt("supplier", locale)}
+                    </span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 text-warm-400">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+
+                  <AnimatePresence>
+                    {showSupplierDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl bg-white dark:bg-warm-800 border border-warm-200 dark:border-warm-700 shadow-xl overflow-hidden"
+                      >
+                        <div className="p-2 border-b border-warm-100 dark:border-warm-700">
+                          <div className="relative">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-400">
+                              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input
+                              type="text"
+                              value={supplierSearch}
+                              onChange={(e) => setSupplierSearch(e.target.value)}
+                              placeholder="Search supplier..."
+                              className="w-full pl-8 pr-3 py-2 rounded-lg bg-warm-50 dark:bg-warm-700 border border-warm-200 dark:border-warm-600 text-sm outline-none focus:border-terracotta-500"
+                              autoFocus
+                            />
+                          </div>
+                        </div>
+                        <div className="max-h-40 overflow-y-auto">
+                          <button
+                            type="button"
+                            onClick={() => { setValue("supplier", ""); setShowSupplierDropdown(false); setSupplierSearch(""); }}
+                            className="w-full text-left px-3 py-2.5 text-sm hover:bg-warm-50 dark:hover:bg-warm-700 transition-colors min-h-[40px]"
+                          >
+                            <span className="text-warm-400">None / Walk-in</span>
+                          </button>
+                          {filteredSuppliers.length === 0 && (
+                            <p className="px-3 py-4 text-xs text-warm-400 text-center">No suppliers found</p>
+                          )}
+                          {filteredSuppliers.map((s) => (
+                            <button
+                              key={s.id}
+                              type="button"
+                              onClick={() => { setValue("supplier", s.name); setShowSupplierDropdown(false); setSupplierSearch(""); }}
+                              className={`w-full text-left px-3 py-2.5 text-sm hover:bg-warm-50 dark:hover:bg-warm-700 transition-colors min-h-[40px] ${
+                                watchSupplier === s.name ? "bg-terracotta-50 dark:bg-terracotta-900/20" : ""
+                              }`}
+                            >
+                              <p className="font-medium text-warm-900 dark:text-warm-50 truncate">{s.name}</p>
+                              <p className="text-[10px] text-warm-400">{s.phone}{s.location ? ` · ${s.location}` : ""}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
 
               <div className="flex gap-3 pt-2">

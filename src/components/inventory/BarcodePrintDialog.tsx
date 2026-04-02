@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import JsBarcode from "jsbarcode";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Product } from "@/data/inventoryData";
 import { useResponsiveDialog } from "@/hooks/useResponsiveDialog";
@@ -12,52 +13,90 @@ interface BarcodePrintDialogProps {
   onClose: () => void;
 }
 
-type BarcodeFormat = "code128" | "ean13";
+type BarcodeFormat = "CODE128" | "EAN13";
 type LabelSize = "small" | "medium" | "large";
 
-const LABEL_SIZES: { key: LabelSize; label: string; w: number; h: number }[] = [
-  { key: "small", label: "30×20mm", w: 30, h: 20 },
-  { key: "medium", label: "50×30mm", w: 50, h: 30 },
-  { key: "large", label: "100×50mm", w: 100, h: 50 },
+const LABEL_SIZES: { key: LabelSize; label: string; w: number; h: number; fontSize: { name: number; price: number; sku: number } }[] = [
+  { key: "small", label: "30×20mm", w: 30, h: 20, fontSize: { name: 6, price: 7, sku: 5 } },
+  { key: "medium", label: "50×30mm", w: 50, h: 30, fontSize: { name: 8, price: 9, sku: 6 } },
+  { key: "large", label: "100×50mm", w: 100, h: 50, fontSize: { name: 10, price: 12, sku: 8 } },
 ];
 
 export default function BarcodePrintDialog({ product, isOpen, onClose }: BarcodePrintDialogProps) {
-  const [format, setFormat] = useState<BarcodeFormat>("code128");
+  const [format, setFormat] = useState<BarcodeFormat>("CODE128");
   const [labelSize, setLabelSize] = useState<LabelSize>("medium");
   const [copies, setCopies] = useState(1);
   const { isMobile } = useResponsiveDialog();
   const printRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
-  const barcodeData = useMemo(() => {
-    if (!product) return "";
-    return format === "ean13" ? product.sku.replace(/[^0-9]/g, "").slice(0, 13).padEnd(13, "0") : product.sku;
-  }, [product, format]);
-
-  const bars = useMemo(() => generateBars(barcodeData, format), [barcodeData, format]);
-
-  const handlePrint = useCallback(() => {
-    if (!printRef.current || !product) return;
-    const content = Array.from({ length: copies }).map(() => printRef.current!.innerHTML).join("");
-    const win = window.open("", "_blank", "width=800,height=600");
-    if (!win) return;
-    win.document.write(`<!DOCTYPE html><html><head><title>Barcode - ${product.name}</title><style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font-family: 'Courier New', monospace; display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; justify-content: center; }
-      .label { border: 1px dashed #ccc; padding: 8px; text-align: center; page-break-inside: avoid; }
-      .barcode-bars { display: flex; justify-content: center; height: ${labelSize === "small" ? 30 : labelSize === "medium" ? 50 : 80}px; margin: 4px 0; }
-      .barcode-bar { width: 1px; background: #000; }
-      .product-name { font-size: ${labelSize === "small" ? 7 : labelSize === "medium" ? 9 : 11}px; font-weight: bold; margin-top: 2px; }
-      .product-price { font-size: ${labelSize === "small" ? 8 : labelSize === "medium" ? 10 : 13}px; font-weight: bold; }
-      .product-sku { font-size: ${labelSize === "small" ? 6 : labelSize === "medium" ? 7 : 9}px; color: #666; }
-      @media print { body { padding: 0; } .label { border: none; } }
-    </style></head><body>${content}</body></html>`);
-    win.document.close();
-    setTimeout(() => win.print(), 300);
-  }, [copies, product, labelSize]);
-
-  if (!isOpen || !product) return null;
+  const barcodeData = format === "EAN13" ? product?.sku.replace(/[^0-9]/g, "").slice(0, 13).padEnd(13, "0") || "0000000000000" : product?.sku || "";
 
   const sizeConfig = LABEL_SIZES.find((s) => s.key === labelSize)!;
+
+  useEffect(() => {
+    if (svgRef.current && product && barcodeData) {
+      try {
+        JsBarcode(svgRef.current, barcodeData, {
+          format: format,
+          width: 2,
+          height: sizeConfig.h * 2.5,
+          displayValue: false,
+          margin: 0,
+          background: "transparent",
+          lineColor: "#000",
+        });
+      } catch (e) {
+        console.warn("Barcode generation error:", e);
+      }
+    }
+  }, [barcodeData, format, product, sizeConfig.h]);
+
+  const handlePrint = useCallback(async () => {
+    if (!printRef.current || !product) return;
+
+    const svgElement = printRef.current.querySelector("svg");
+    if (!svgElement) return;
+
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    const content = Array.from({ length: copies }).map(() => {
+      return `
+        <div class="label" style="width: ${sizeConfig.w}mm; height: ${sizeConfig.h}mm; padding: 2mm; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px dashed #ccc; page-break-inside: avoid; box-sizing: border-box;">
+          <img src="${svgUrl}" style="height: ${sizeConfig.h * 0.5}mm; width: auto; display: block; margin-bottom: 1mm;" />
+          <div style="font-size: ${sizeConfig.fontSize.name}pt; font-weight: bold; font-family: monospace; line-height: 1.1; max-height: ${sizeConfig.fontSize.name * 1.5}pt; overflow: hidden; text-align: center;">
+            ${product.name.length > 20 ? product.name.slice(0, 18) + ".." : product.name}
+          </div>
+          <div style="font-size: ${sizeConfig.fontSize.price}pt; font-weight: bold; font-family: monospace; margin-top: 0.5mm;">
+            KSh ${product.sellingPrice.toLocaleString()}
+          </div>
+          <div style="font-size: ${sizeConfig.fontSize.sku}pt; font-family: monospace; color: #666;">
+            ${barcodeData}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    const win = window.open("", "_blank", "width=800,height=600");
+    if (!win) return;
+
+    win.document.write(`<!DOCTYPE html><html><head><title>Barcode - ${product.name}</title><style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: monospace; display: flex; flex-wrap: wrap; gap: 4mm; padding: 10mm; justify-content: center; background: #f5f5f5; }
+      @media print { body { padding: 5mm; background: white; } .label { border: none; } }
+      @page { margin: 0; size: auto; }
+    </style></head><body>${content}</body></html>`);
+    win.document.close();
+
+    setTimeout(() => {
+      win.print();
+      URL.revokeObjectURL(svgUrl);
+    }, 500);
+  }, [copies, product, sizeConfig, barcodeData]);
+
+  if (!isOpen || !product) return null;
 
   return (
     <AnimatePresence>
@@ -103,12 +142,12 @@ export default function BarcodePrintDialog({ product, isOpen, onClose }: Barcode
               <div>
                 <label className="block text-xs font-medium text-warm-500 dark:text-warm-400 mb-2">Barcode Format</label>
                 <div className="flex gap-2">
-                  {(["code128", "ean13"] as BarcodeFormat[]).map((f) => (
+                  {(["CODE128", "EAN13"] as BarcodeFormat[]).map((f) => (
                     <button key={f} onClick={() => setFormat(f)}
                       className={`flex-1 py-2.5 rounded-xl border-2 text-xs font-heading font-bold transition-all min-h-[40px] ${
                         format === f ? "border-terracotta-500 bg-terracotta-50 dark:bg-terracotta-900/15 text-terracotta-600" : "border-warm-200 dark:border-warm-700 text-warm-500 dark:text-warm-400 hover:border-warm-300"
                       }`}>
-                      {f === "code128" ? "Code 128" : "EAN-13"}
+                      {f === "CODE128" ? "Code 128" : "EAN-13"}
                     </button>
                   ))}
                 </div>
@@ -145,19 +184,42 @@ export default function BarcodePrintDialog({ product, isOpen, onClose }: Barcode
               <div className="rounded-xl border border-warm-200/60 dark:border-warm-700/60 bg-warm-50 dark:bg-warm-800/50 p-4">
                 <p className="text-xs font-medium text-warm-500 dark:text-warm-400 mb-3">Preview</p>
                 <div ref={printRef} className="flex justify-center">
-                  <div className="label inline-block bg-white rounded-lg p-3 text-center shadow-sm border border-warm-100">
-                    <div className="barcode-bars flex justify-center items-end" style={{ height: sizeConfig.h * 1.5, gap: "0px" }}>
-                      {bars.map((w, i) => (
-                        <div key={i} style={{ width: w, height: "100%", background: "#000", flexShrink: 0 }} />
-                      ))}
-                    </div>
-                    <p className="product-name font-mono font-bold text-warm-900 mt-1.5" style={{ fontSize: labelSize === "small" ? 8 : labelSize === "medium" ? 10 : 12 }}>
-                      {product.name.length > 24 ? product.name.slice(0, 22) + ".." : product.name}
+                  <div 
+                    className="label inline-block bg-white rounded-lg p-2 text-center shadow-sm border border-warm-100"
+                    style={{ 
+                      width: sizeConfig.w * 4, 
+                      height: sizeConfig.h * 4,
+                      maxWidth: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg 
+                      ref={svgRef}
+                      style={{ 
+                        height: sizeConfig.h * 1.5, 
+                        width: 'auto',
+                        maxWidth: '100%'
+                      }}
+                    />
+                    <p 
+                      className="font-mono font-bold text-warm-900 mt-1" 
+                      style={{ fontSize: sizeConfig.fontSize.name }}
+                    >
+                      {product.name.length > 20 ? product.name.slice(0, 18) + ".." : product.name}
                     </p>
-                    <p className="product-price font-mono font-extrabold text-warm-900" style={{ fontSize: labelSize === "small" ? 9 : labelSize === "medium" ? 12 : 15 }}>
+                    <p 
+                      className="font-mono font-extrabold text-warm-900" 
+                      style={{ fontSize: sizeConfig.fontSize.price }}
+                    >
                       KSh {product.sellingPrice.toLocaleString()}
                     </p>
-                    <p className="product-sku font-mono text-warm-400" style={{ fontSize: labelSize === "small" ? 6 : labelSize === "medium" ? 7 : 9 }}>
+                    <p 
+                      className="font-mono text-warm-400" 
+                      style={{ fontSize: sizeConfig.fontSize.sku }}
+                    >
                       {barcodeData}
                     </p>
                   </div>
@@ -182,26 +244,4 @@ export default function BarcodePrintDialog({ product, isOpen, onClose }: Barcode
       )}
     </AnimatePresence>
   );
-}
-
-function generateBars(data: string, format: BarcodeFormat): number[] {
-  if (!data) return [];
-  const bars: number[] = [];
-  const seed = data.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-  const rng = (i: number) => ((seed * 31 + i * 17) % 100);
-
-  if (format === "ean13") {
-    // Simplified EAN-13 pattern
-    for (let i = 0; i < 95; i++) {
-      const r = rng(i);
-      bars.push(r % 3 === 0 ? 2 : 1);
-    }
-  } else {
-    // Code 128 simplified pattern
-    for (let i = 0; i < data.length * 11 + 35; i++) {
-      const r = rng(i);
-      bars.push(r % 4 === 0 ? 3 : r % 3 === 0 ? 2 : 1);
-    }
-  }
-  return bars;
 }

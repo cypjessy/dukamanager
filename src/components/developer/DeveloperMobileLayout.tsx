@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import type { Locale } from "@/types";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   children: React.ReactNode;
@@ -52,8 +53,8 @@ const moreItems = [
   )},
 ];
 
-function MobileMoreSheet({ isOpen, onClose, locale, pathname }: {
-  isOpen: boolean; onClose: () => void; locale: Locale; pathname: string;
+function MobileMoreSheet({ isOpen, onClose, locale, pathname, onLogout }: {
+  isOpen: boolean; onClose: () => void; locale: Locale; pathname: string; onLogout: () => void;
 }) {
   const _t = (en: string, sw: string) => locale === "sw" ? sw : en;
 
@@ -75,6 +76,17 @@ function MobileMoreSheet({ isOpen, onClose, locale, pathname }: {
                   </Link>
                 );
               })}
+              <button
+                onClick={() => { onClose(); onLogout(); }}
+                className="w-full flex items-center gap-3 p-3 rounded-xl transition-colors bg-red-50 dark:bg-red-900/15 mt-2"
+              >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-100 dark:bg-red-900/30 text-red-500">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                </div>
+                <div className="text-left"><p className="text-sm font-semibold text-red-600 dark:text-red-400">{_t("Log Out", "Ondoka")}</p></div>
+              </button>
             </div>
           </motion.div>
         </>
@@ -83,7 +95,7 @@ function MobileMoreSheet({ isOpen, onClose, locale, pathname }: {
   );
 }
 
-export default function DeveloperMobileLayout({ children, locale, userName, userRole: _userRole, onLogout: _onLogout }: Props) {
+export default function DeveloperMobileLayout({ children, locale, userName, userRole: _userRole, onLogout }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const [showMoreSheet, setShowMoreSheet] = useState(false);
@@ -101,7 +113,7 @@ export default function DeveloperMobileLayout({ children, locale, userName, user
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-warm-50 dark:bg-warm-950">
+    <div className="flex flex-col h-[100dvh] bg-warm-50 dark:bg-warm-950 overflow-hidden">
       {/* Status bar spacer */}
       <div className="h-0" />
 
@@ -123,6 +135,15 @@ export default function DeveloperMobileLayout({ children, locale, userName, user
             <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <span className="text-white font-bold text-[10px]">{userName.slice(0, 2).toUpperCase()}</span>
             </div>
+            <button
+              onClick={onLogout}
+              className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
+              title={t("Log Out", "Ondoka")}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
@@ -157,7 +178,7 @@ export default function DeveloperMobileLayout({ children, locale, userName, user
       </nav>
 
       {/* More Sheet */}
-      <MobileMoreSheet isOpen={showMoreSheet} onClose={() => setShowMoreSheet(false)} locale={locale} pathname={pathname} />
+      <MobileMoreSheet isOpen={showMoreSheet} onClose={() => setShowMoreSheet(false)} locale={locale} pathname={pathname} onLogout={onLogout} />
     </div>
   );
 }

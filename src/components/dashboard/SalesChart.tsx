@@ -26,6 +26,7 @@ interface DailySales {
 interface SalesChartProps {
   locale: Locale;
   dailySales: DailySales[];
+  isMobile?: boolean;
 }
 
 type Period = "daily" | "weekly" | "monthly";
@@ -48,7 +49,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   );
 };
 
-export default function SalesChart({ locale, dailySales }: SalesChartProps) {
+export default function SalesChart({ locale, dailySales, isMobile }: SalesChartProps) {
   const [period, setPeriod] = useState<Period>("daily");
 
   return (
@@ -84,7 +85,7 @@ export default function SalesChart({ locale, dailySales }: SalesChartProps) {
       </div>
 
       {dailySales.length > 0 ? (
-        <div className="flex-1 min-h-[200px]">
+        <div className={isMobile ? 'h-[220px]' : 'flex-1 min-h-[200px]'}>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={dailySales} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
@@ -108,7 +109,7 @@ export default function SalesChart({ locale, dailySales }: SalesChartProps) {
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center min-h-[200px]">
+        <div className={`flex-1 flex items-center justify-center ${isMobile ? 'h-[220px] min-h-[220px]' : 'min-h-[200px]'}`}>
           <p className="text-sm text-warm-400">{locale === "sw" ? "Hakuna mauzo bado" : "No sales data yet"}</p>
         </div>
       )}

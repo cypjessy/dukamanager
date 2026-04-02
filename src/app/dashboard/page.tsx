@@ -431,8 +431,8 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <div className="rounded-2xl border border-warm-200/60 dark:border-warm-700/60 overflow-hidden" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
-            <SalesChart locale={locale} dailySales={dailySales} />
+          <div className="rounded-2xl border border-warm-200/60 dark:border-warm-700/60 overflow-hidden h-[300px]" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
+            <SalesChart locale={locale} dailySales={dailySales} isMobile={isMobile} />
           </div>
 
           {/* Low Stock */}
@@ -505,8 +505,8 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-warm-200/60 dark:border-warm-700/60 overflow-hidden" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
-            <RecentTransactions locale={locale} transactions={recentTransactions} />
+          <div className="rounded-2xl border border-warm-200/60 dark:border-warm-700/60 overflow-hidden h-[300px]" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
+            <SalesChart locale={locale} dailySales={dailySales} isMobile={isMobile} />
           </div>
           </div>
       ) : (

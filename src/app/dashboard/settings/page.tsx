@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "@/providers/LocaleProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -30,7 +30,6 @@ const tabs: { key: SettingsTab; label: string; labelSw: string; icon: React.Reac
 
 export default function SettingsPage() {
   const { locale } = useLocale();
-  const { theme, toggleTheme } = useTheme();
   const { isMobile } = useViewport();
   const { shopSettings, paymentSettings, notificationSettings, loading, saveShopSettings, savePaymentSettings, saveNotificationSettings } = useSettingsFirestore();
   const [activeTab, setActiveTab] = useState<SettingsTab>("shop");
@@ -63,7 +62,7 @@ export default function SettingsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-terracotta-500 to-savanna-500 animate-pulse" />
+           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-terracotta-500 to-savanna-500 animate-pulse"></div>
           <p className="text-sm text-warm-500">{locale === "sw" ? "Inapakia..." : "Loading..."}</p>
         </div>
       </div>
@@ -75,15 +74,15 @@ export default function SettingsPage() {
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={isMobile ? "mb-4" : "mb-3 page-section-fixed"}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <h1 className="font-heading text-xl sm:text-2xl font-extrabold text-warm-900 dark:text-warm-50">
+            <h1 className="font-heading text-xl sm:text-2xl font-extrabold text-warm-900">
               {dt("settings", locale)}
             </h1>
-            <p className="text-sm text-warm-500 dark:text-warm-400 mt-0.5">
+            <p className="text-sm text-warm-500 mt-0.5">
               {locale === "sw" ? "Sanidi mfumo wako" : "Configure your duka system"}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 rounded-xl bg-forest-50 dark:bg-forest-900/10 px-3 py-1.5">
+            <div className="flex items-center gap-2 rounded-xl bg-forest-50 px-3 py-1.5">
               <span className="w-2 h-2 rounded-full bg-forest-500" />
               <span className="text-xs text-forest-600 font-medium">{locale === "sw" ? "Imehifadhiwa" : "Synced"}</span>
             </div>
@@ -103,7 +102,7 @@ export default function SettingsPage() {
 
       <div className={isMobile ? "" : "flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4"}>
         <div className="hidden lg:flex flex-col overflow-y-auto scroll-container desktop-sidebar-content">
-          <div className="rounded-2xl border border-warm-200/60 dark:border-warm-700/60 overflow-hidden" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
+          <div className="rounded-2xl border border-warm-200/60border-warm-700/60 overflow-hidden" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
             <TabSwitcher
               variant="vertical"
               tabs={tabs.map((t) => ({ key: t.key, label: t.label, labelSw: t.labelSw, icon: t.icon }))}
@@ -113,26 +112,15 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="mt-3 rounded-2xl border border-warm-200/60 dark:border-warm-700/60 p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-sm font-medium text-warm-900 dark:text-warm-50">{locale === "sw" ? "Hali Nyeusi" : "Dark Mode"}</span>
-              <button onClick={toggleTheme} className={`relative w-11 h-6 rounded-full transition-colors ${theme === "dark" ? "bg-terracotta-500" : "bg-warm-300"}`} role="switch" aria-checked={theme === "dark"}>
-                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${theme === "dark" ? "translate-x-5" : "translate-x-0.5"}`} />
-              </button>
-            </div>
-            <p className="text-xs text-warm-400">{locale === "sw" ? "Badilisha mandhari" : "Switch between light and dark themes"}</p>
-          </div>
-        </div>
-
-        <div className={isMobile ? "" : "flex-1 overflow-y-auto scroll-container"}>
+          <div className={isMobile ? "" : "flex-1 overflow-y-auto scroll-container"}>
           <div className="mobile-accordion lg:hidden space-y-2 mb-4">
             {tabs.map((tab) => (
-              <div key={tab.key} className="rounded-2xl border border-warm-200/60 dark:border-warm-700/60 overflow-hidden" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
+              <div key={tab.key} className="rounded-2xl border border-warm-200/60border-warm-700/60 overflow-hidden" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}>
                 <button onClick={() => setMobileExpanded(mobileExpanded === tab.key ? null : tab.key)}
                   className="w-full flex items-center justify-between px-4 py-3 min-h-[48px]">
                   <div className="flex items-center gap-3">
                     <span className="text-terracotta-500">{tab.icon}</span>
-                    <span className="font-heading font-bold text-sm text-warm-900 dark:text-warm-50">{locale === "sw" ? tab.labelSw : tab.label}</span>
+                    <span className="font-heading font-bold text-sm text-warm-900text-warm-50">{locale === "sw" ? tab.labelSw : tab.label}</span>
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`text-warm-400 transition-transform ${mobileExpanded === tab.key ? "rotate-180" : ""}`}>
                     <polyline points="6 9 12 15 18 9" />
