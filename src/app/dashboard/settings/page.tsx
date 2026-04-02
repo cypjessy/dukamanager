@@ -55,6 +55,7 @@ export default function SettingsPage() {
       case "notifications": return <NotificationsPanel locale={locale} onChange={handleChange} />;
       case "data": return <DataSecurityPanel locale={locale} onChange={handleChange} />;
       case "advanced": return <AdvancedPanel locale={locale} onChange={handleChange} />;
+      default: return null;
     }
   };
 
