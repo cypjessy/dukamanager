@@ -970,7 +970,7 @@ function CashierPortalInner() {
         onRefundComplete={handleRefundComplete}
         recentSales={recentSales}
         products={refundProducts}
-        shopSupervisorPin={supervisorPinValue}
+        shopSupervisorPin={supervisorPinValue ?? undefined}
       />
 
       {/* Sync Progress Modal */}
