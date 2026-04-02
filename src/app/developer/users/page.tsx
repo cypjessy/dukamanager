@@ -58,7 +58,7 @@ export default function DeveloperUsersPage() {
         ]);
         const allUsers: any[] = usersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
         const allShops: any[] = shopsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        allUsers.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+        allUsers.sort((a: any, b: any) => new Date((b.createdAt as string) || 0).getTime() - new Date((a.createdAt as string) || 0).getTime());
         setUsers(allUsers);
         setShops(allShops);
       } catch (err) {
@@ -77,7 +77,7 @@ export default function DeveloperUsersPage() {
   }, [shops]);
 
   const filtered = useMemo(() => {
-    let result = users.filter((u) => {
+    const result = users.filter((u) => {
       const matchesSearch = !search || (u.email || "").toLowerCase().includes(search.toLowerCase()) || (u.displayName || "").toLowerCase().includes(search.toLowerCase()) || (u.phone || "").includes(search);
       const matchesRole = roleFilter === "all" || u.role === roleFilter;
       const isActive = u.isActive !== false;
@@ -131,7 +131,7 @@ export default function DeveloperUsersPage() {
       try {
         await updateDoc(doc(db, "users", uid), { forceLogout: true, forceLogoutAt: new Date().toISOString() });
         toast.success(t("User logged out", "Mtumiaji ametolewa nje"));
-      } catch (err) {
+      } catch (_err) {
         toast.error(t("Failed to logout user", "Imeshindwa kumtoa mtumiaji"));
       }
     }
@@ -152,7 +152,7 @@ export default function DeveloperUsersPage() {
     if (selectedUsers.size === paginated.length) {
       setSelectedUsers(new Set());
     } else {
-      setSelectedUsers(new Set(paginated.map(u => u.id)));
+      setSelectedUsers(new Set<string>(paginated.map(u => u.id)));
     }
   };
 

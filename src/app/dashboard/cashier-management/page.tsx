@@ -76,7 +76,7 @@ function SupervisorPinSettings() {
           className="w-full py-2.5 rounded-xl bg-terracotta-500 text-white text-xs font-bold min-h-[40px] disabled:opacity-40">
           {saving ? "Saving..." : "Update Supervisor PIN"}
         </button>
-        <p className="text-[10px] text-warm-400 text-center">Current PIN: {"\u2022".repeat(pin.length)} ({pin.length} digits)</p>
+        <p className="text-[10px] text-warm-400 text-center">Current PIN: {"\u2022".repeat(pin?.length ?? 0)} ({pin?.length ?? 0} digits)</p>
       </div>
     </div>
   );

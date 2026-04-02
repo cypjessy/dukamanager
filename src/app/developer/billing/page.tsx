@@ -7,7 +7,7 @@ import { useDeveloperData } from "@/hooks/useDeveloperData";
 import { collection, getDocs, updateDoc, doc, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { subscriptionPlans } from "@/data/developerData";
-import type { Invoice, InvoiceStatus } from "@/data/developerData";
+import type { InvoiceStatus } from "@/data/developerData";
 import toast from "react-hot-toast";
 
 interface FirestoreInvoice {
@@ -26,9 +26,9 @@ interface FirestoreInvoice {
 
 export default function DeveloperBillingPage() {
   const { locale } = useLocale();
-  const { shops, metrics, loading } = useDeveloperData();
+  const { shops, loading } = useDeveloperData();
   const [invoices, setInvoices] = useState<FirestoreInvoice[]>([]);
-  const [invoicesLoading, setInvoicesLoading] = useState(true);
+  const [_invoicesLoading, setInvoicesLoading] = useState(true);
   const [invoiceFilter, setInvoiceFilter] = useState<"all" | InvoiceStatus>("all");
   const [searchInvoice, setSearchInvoice] = useState("");
   const [selectedInvoice, setSelectedInvoice] = useState<FirestoreInvoice | null>(null);
@@ -113,7 +113,7 @@ export default function DeveloperBillingPage() {
       });
       setInvoices(prev => prev.map(inv => inv.id === markPaidInvoice.id ? { ...inv, status: "paid" as const, paidAt: new Date().toISOString().split("T")[0], paymentMethod: "mpesa" } : inv));
       toast.success(t(`Invoice ${markPaidInvoice.id} marked as paid`, `Ankara ${markPaidInvoice.id} imewekwa kama imelipwa`));
-    } catch (err) {
+    } catch (_err) {
       toast.error(t("Failed to update invoice", "Imeshindwa kusasisha ankara"));
     }
     setShowMarkPaidModal(false);
@@ -125,10 +125,10 @@ export default function DeveloperBillingPage() {
     try {
       await updateDoc(doc(db, "invoices", inv.id), {
         reminderSentAt: new Date().toISOString(),
-        reminderCount: (inv as any).reminderCount ? (inv as any).reminderCount + 1 : 1,
+        reminderCount: (inv as { reminderCount?: number }).reminderCount ? (inv as { reminderCount?: number }).reminderCount! + 1 : 1,
       });
       toast.success(t(`Reminder sent to ${inv.tenantName}`, `Kumbusho limetumwa kwa ${inv.tenantName}`));
-    } catch (err) {
+    } catch (_err) {
       toast.error(t("Failed to send reminder", "Imeshindwa kutuma kumbusho"));
     }
   };

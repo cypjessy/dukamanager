@@ -217,7 +217,7 @@ export default function Header({
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm">
                     <span className="text-white font-heading font-bold text-[11px]">
-                      {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
+                      {((user as any)?.name || (user as any)?.email || "U").charAt(0).toUpperCase()}
                     </span>
                   </div>
                 </button>
@@ -233,9 +233,9 @@ export default function Header({
                     >
                       <div className="px-4 py-3 border-b border-warm-200/60 dark:border-warm-700/60">
                         <p className="text-sm font-semibold text-warm-900 dark:text-warm-50">
-                          {user?.name}
+                          {(user as any)?.name}
                         </p>
-                        <p className="text-xs text-warm-400">{user?.phone}</p>
+                        <p className="text-xs text-warm-400">{(user as any)?.phone}</p>
                       </div>
 
                       <div className="p-2">
@@ -428,10 +428,10 @@ export default function Header({
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-semibold text-warm-900 dark:text-warm-50">
-                            {notif.title[locale]}
+                            {(notif as any).title[locale]}
                           </p>
                           <p className="text-xs text-warm-500 dark:text-warm-400 mt-0.5 line-clamp-2">
-                            {notif.message[locale]}
+                            {(notif as any).message[locale]}
                           </p>
                           <p className="text-[10px] text-warm-400 dark:text-warm-500 mt-1">
                             {notif.time}
@@ -476,9 +476,9 @@ export default function Header({
                 >
                   <div className="px-4 py-3 border-b border-warm-200/60 dark:border-warm-700/60">
                     <p className="text-sm font-semibold text-warm-900 dark:text-warm-50">
-                      {user?.name}
+                      {(user as any)?.name}
                     </p>
-                    <p className="text-xs text-warm-400">{user?.phone}</p>
+                    <p className="text-xs text-warm-400">{(user as any)?.phone}</p>
                   </div>
 
                   <div className="border-b border-warm-200/60 dark:border-warm-700/60">

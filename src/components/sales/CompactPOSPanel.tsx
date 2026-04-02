@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { CartItem, PaymentMethod } from "@/data/salesData";
+import { type CartItem, type PaymentMethod, creditCustomers } from "@/data/salesData";
 import type { Locale } from "@/types";
 import { useBarcodeScanner, playBeep } from "@/hooks/useBarcodeScanner";
 import CameraScanner from "@/components/sales/CameraScanner";

@@ -47,7 +47,7 @@ export default function DeveloperTenantsPage() {
   const [selectedShops, setSelectedShops] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState<string>("");
   const [page, setPage] = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
+  const [_showFilters, _setShowFilters] = useState(false);
   const pageSize = 12;
 
   const t = (en: string, sw: string) => locale === "sw" ? sw : en;
@@ -58,7 +58,7 @@ export default function DeveloperTenantsPage() {
   }, [shops]);
 
   const filtered = useMemo(() => {
-    let result = shops.filter((s) => {
+    const result = shops.filter((s) => {
       const matchesSearch = !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.owner.toLowerCase().includes(search.toLowerCase());
       const matchesStatus = statusFilter === "all" || s.status === statusFilter;
       const matchesPlan = planFilter === "all" || s.subscription === planFilter;

@@ -68,7 +68,7 @@ export default function SalesAnalytics({ locale, transactions }: Props) {
             <BarChart data={dailySales}>
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#8c8a85" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: "#8c8a85" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-              <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(212,165,116,0.2)", fontSize: 12 }} formatter={(v: number) => [`KSh ${v.toLocaleString()}`, "Sales"]} />
+              <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(212,165,116,0.2)", fontSize: 12 }} formatter={(v: any) => [`KSh ${Number(v).toLocaleString()}`, "Sales"]} />
               <Bar dataKey="sales" fill="#C75B39" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

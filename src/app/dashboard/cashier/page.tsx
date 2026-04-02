@@ -352,7 +352,7 @@ function AdminSalesInner() {
   );
 
   const handlePaymentComplete = useCallback(
-    async (method: string, amount: number) => {
+    async (method: string, _amount: number) => {
       const txnId = `TXN-${Date.now().toString(36).toUpperCase()}`;
       const receiptCode = currentReceiptCode || `DM${Date.now().toString(36).toUpperCase().slice(-6)}${Math.random().toString(36).slice(2, 4).toUpperCase()}`;
       const selectedCustomer = firestoreCustomers.find(c => c.id === selectedCustomerId);
@@ -940,7 +940,7 @@ function AdminSalesInner() {
         onRefundComplete={handleRefundComplete}
         recentSales={recentSales}
         products={refundProducts}
-        shopSupervisorPin={supervisorPinValue}
+        shopSupervisorPin={supervisorPinValue ?? undefined}
       />
 
       {/* Sync Progress Modal */}

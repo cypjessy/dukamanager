@@ -66,7 +66,7 @@ export default function SalesReports({ sales, topProducts, locale }: Props) {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#8c8a85" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: "#8c8a85" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-              <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(212,165,116,0.2)", fontSize: 12 }} formatter={(v: number) => [`KSh ${v.toLocaleString()}`, ""]} />
+              <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(212,165,116,0.2)", fontSize: 12 }} formatter={(v: any) => [`KSh ${Number(v).toLocaleString()}`, ""]} />
               <Area type="monotone" dataKey="revenue" stroke="#C75B39" fill="url(#revGrad)" strokeWidth={2} name="Revenue" />
               <Legend wrapperStyle={{ fontSize: 11 }} />
             </AreaChart>
@@ -86,7 +86,7 @@ export default function SalesReports({ sales, topProducts, locale }: Props) {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#8c8a85" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: "#8c8a85" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-              <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} formatter={(v: number) => [`KSh ${v.toLocaleString()}`, ""]} />
+              <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} formatter={(v: any) => [`KSh ${Number(v).toLocaleString()}`, ""]} />
               <Bar dataKey="mpesa" stackId="a" fill="#00A650" radius={[0, 0, 0, 0]} name="M-Pesa" />
               <Bar dataKey="cash" stackId="a" fill="#C75B39" name="Cash" />
               <Bar dataKey="credit" stackId="a" fill="#E85D04" radius={[4, 4, 0, 0]} name="Credit" />

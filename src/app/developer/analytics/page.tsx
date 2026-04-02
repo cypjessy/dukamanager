@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocale } from "@/providers/LocaleProvider";
 import { useDeveloperData } from "@/hooks/useDeveloperData";
@@ -57,7 +57,7 @@ export default function DeveloperAnalyticsPage() {
   }, []);
 
   const topShops = useMemo(() => [...shops].sort((a, b) => b.monthlyRevenue - a.monthlyRevenue).slice(0, 10), [shops]);
-  const bottomShops = useMemo(() => [...shops].sort((a, b) => a.monthlyRevenue - b.monthlyRevenue).slice(0, 5), [shops]);
+  const _bottomShops = useMemo(() => [...shops].sort((a, b) => a.monthlyRevenue - b.monthlyRevenue).slice(0, 5), [shops]);
 
   const planDistribution = useMemo(() => [
     { name: "Free", value: shops.filter((s) => s.subscription === "free").length, color: "#9ca3af" },

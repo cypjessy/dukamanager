@@ -27,7 +27,7 @@ export function UserTable({
   onSelectAll,
 }: UserTableProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [expandedRow] = useState<string | null>(null);
 
   const getInitials = (name: string) =>
     name
@@ -96,7 +96,7 @@ export function UserTable({
               {cashiers.map((cashier) => {
                 const isSelected = bulkSelection.has(cashier.uid);
                 const isHovered = hoveredRow === cashier.uid;
-                const isExpanded = expandedRow === cashier.uid;
+                const _isExpanded = expandedRow === cashier.uid;
 
                 return (
                   <motion.tr

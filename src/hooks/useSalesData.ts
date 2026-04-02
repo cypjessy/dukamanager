@@ -95,7 +95,7 @@ export interface ReturnEntry {
   originalSaleId: string;
   items: Array<{ name: string; qty: number; price: number; reason: string }>;
   total: number;
-  method: "mpesa" | "cash" | "credit";
+  method: "mpesa" | "cash" | "credit" | "bank";
   reason: "damaged" | "wrong_item" | "changed_mind" | "quality" | "other";
   cashierId: string;
   cashierName: string;
@@ -134,7 +134,7 @@ export interface InventoryImpact {
   soldToday: number;
   daysUntilStockout: number;
   suggestedReorder: number;
-  status: "ok" | "low" | "critical" | "overstocked";
+  status: "ok" | "low" | "critical" | "overstocked" | "out";
 }
 
 export interface FraudAlert {
@@ -195,7 +195,7 @@ export interface UseSalesDataReturn {
 const AVATAR_COLORS = ["#C75B39", "#2D5A3D", "#D4A574", "#4A90D9", "#8B5CF6", "#F59E0B", "#EC4899", "#06B6D4"];
 
 export function useSalesData(): UseSalesDataReturn {
-  const { shopId, user } = useAuth();
+  const { shopId } = useAuth();
   const { products } = useProducts();
   const [sales, setSales] = useState<AdminSale[]>([]);
   const [loading, setLoading] = useState(true);
@@ -234,7 +234,7 @@ export function useSalesData(): UseSalesDataReturn {
       const map: Record<string, { name: string; color: string }> = {};
       data.forEach((u, idx) => {
         const name = u.displayName || u.email?.split("@")[0] || "Cashier";
-        map[u.id || `user_${idx}`] = {
+        map[(u as Record<string, unknown>).id as string || `user_${idx}`] = {
           name,
           color: AVATAR_COLORS[idx % AVATAR_COLORS.length],
         };

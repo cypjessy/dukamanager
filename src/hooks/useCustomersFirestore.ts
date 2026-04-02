@@ -98,15 +98,15 @@ export function useCustomersFirestore() {
     if (!shopId) throw new Error("No active shop");
     const { db } = await import("@/lib/firebase/config");
     const now = new Date().toISOString();
-    const docData = {
+    const docData: Record<string, unknown> = {
       name: data.name,
-      nickname: data.nickname || data.name,
+      nickname: (data as Record<string, unknown>).nickname || data.name,
       phone: data.phone,
       phoneAlt: data.phoneAlt || "",
-      whatsapp: data.whatsapp || data.phone?.replace(/\s/g, "") || "",
+      whatsapp: (data as Record<string, unknown>).whatsapp || data.phone?.replace(/\s/g, "") || "",
       email: data.email || "",
-      location: data.location || "",
-      segment: data.segment || "new",
+      location: (data as Record<string, unknown>).location || "",
+      segment: (data as Record<string, unknown>).segment || "new",
       loyaltyTier: "bronze",
       loyaltyPoints: 0,
       customerSince: now.slice(0, 10),

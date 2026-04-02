@@ -15,6 +15,7 @@ import Button from "@/components/ui/Button";
 interface SupplierOption {
   id: string;
   name: string;
+  phone?: string;
 }
 
 interface AddEditProductModalProps {

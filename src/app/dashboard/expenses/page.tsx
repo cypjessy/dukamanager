@@ -46,7 +46,7 @@ export default function ExpensesPage() {
   );
 
   const handleEdit = useCallback(
-    async (expense: Expense) => {
+    async (_expense: Expense) => {
       // TODO: Implement edit dialog when expense editing is added
     },
     []

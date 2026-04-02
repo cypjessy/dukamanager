@@ -125,7 +125,7 @@ export default function InventoryPage() {
     setModalOpen(true);
   }, []);
 
-  const handleReorderFromInsight = useCallback((product: Product) => {
+  const _handleReorderFromInsight = useCallback((product: Product) => {
     setEditProduct(product);
     setModalOpen(true);
   }, []);
@@ -143,7 +143,7 @@ export default function InventoryPage() {
         const uploadResult = await uploadToBunny({
           file: data.imageFile,
           folder: "products",
-          shopId,
+          shopId: shopId ?? "",
         });
         if (uploadResult.cdnUrl) {
           imageUrl = uploadResult.cdnUrl;

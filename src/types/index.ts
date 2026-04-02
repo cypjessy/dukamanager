@@ -21,8 +21,8 @@ export interface Benefit {
   description: Record<Locale, string>;
 }
 
-export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger" | "ghost" | "fab";
-export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger" | "ghost" | "fab" | "destructive" | "outline";
+export type ButtonSize = "sm" | "md" | "lg" | "xs";
 
 export interface TabItem {
   key: string;

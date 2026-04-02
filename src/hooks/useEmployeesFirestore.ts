@@ -124,34 +124,35 @@ export function useEmployeesFirestore() {
     if (!shopId) throw new Error("No active shop");
     const { db } = await import("@/lib/firebase/config");
     const now = new Date().toISOString();
-    return addDoc(collection(db, "shops", shopId, "employees"), {
+    const empData: Record<string, unknown> = {
       firstName: data.firstName,
       lastName: data.lastName || "",
-      preferredName: data.preferredName || data.firstName,
+      preferredName: (data as Record<string, unknown>).preferredName || data.firstName,
       phone: data.phone || "",
-      whatsapp: data.whatsapp || data.phone?.replace(/\s/g, "") || "",
+      whatsapp: (data as Record<string, unknown>).whatsapp || data.phone?.replace(/\s/g, "") || "",
       email: data.email || "",
-      nationalId: data.nationalId || "",
-      kraPin: data.kraPin || "",
-      nhifNo: data.nhifNo || "",
-      nssfNo: data.nssfNo || "",
+      nationalId: (data as Record<string, unknown>).nationalId || "",
+      kraPin: (data as Record<string, unknown>).kraPin || "",
+      nhifNo: (data as Record<string, unknown>).nhifNo || "",
+      nssfNo: (data as Record<string, unknown>).nssfNo || "",
       department: data.department || "sales",
       jobTitle: data.jobTitle || "",
       employmentType: data.employmentType || "permanent",
       status: "active",
-      hireDate: data.hireDate || now.slice(0, 10),
-      probationEnd: data.probationEnd || "",
-      monthlySalary: Number(data.monthlySalary) || 0,
-      dailyWage: Number(data.dailyWage) || 0,
-      bankName: data.bankName || "",
-      bankAccount: data.bankAccount || "",
-      mpesaNumber: data.mpesaNumber || "",
-      nextOfKin: data.nextOfKin || "",
-      nextOfKinPhone: data.nextOfKinPhone || "",
+      hireDate: (data as Record<string, unknown>).hireDate || now.slice(0, 10),
+      probationEnd: (data as Record<string, unknown>).probationEnd || "",
+      monthlySalary: Number((data as Record<string, unknown>).monthlySalary) || 0,
+      dailyWage: Number((data as Record<string, unknown>).dailyWage) || 0,
+      bankName: (data as Record<string, unknown>).bankName || "",
+      bankAccount: (data as Record<string, unknown>).bankAccount || "",
+      mpesaNumber: (data as Record<string, unknown>).mpesaNumber || "",
+      nextOfKin: (data as Record<string, unknown>).nextOfKin || "",
+      nextOfKinPhone: (data as Record<string, unknown>).nextOfKinPhone || "",
       attendanceScore: 100,
       punctualityRate: 100,
       createdAt: now,
-    });
+    };
+    return addDoc(collection(db, "shops", shopId, "employees"), empData);
   }, [shopId]);
 
   const updateEmployee = useCallback(async (employeeId: string, data: Partial<Employee>) => {

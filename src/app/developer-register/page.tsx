@@ -38,10 +38,11 @@ export default function DeveloperRegisterPage() {
       await registerDeveloper(email, password, fullName, phone);
       setSuccess(true);
       setTimeout(() => router.push("/"), 2000);
-    } catch (err: any) {
-      const msg = err?.code === "auth/email-already-in-use"
+    } catch (err: unknown) {
+      const e = err as { code?: string; message?: string };
+      const msg = e?.code === "auth/email-already-in-use"
         ? "This email is already registered"
-        : err?.message || "Registration failed";
+        : e?.message || "Registration failed";
       setError(msg);
     } finally {
       setLoading(false);

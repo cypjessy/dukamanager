@@ -55,7 +55,7 @@ const moreItems = [
 function MobileMoreSheet({ isOpen, onClose, locale, pathname }: {
   isOpen: boolean; onClose: () => void; locale: Locale; pathname: string;
 }) {
-  const t = (en: string, sw: string) => locale === "sw" ? sw : en;
+  const _t = (en: string, sw: string) => locale === "sw" ? sw : en;
 
   return (
     <AnimatePresence>
@@ -83,7 +83,7 @@ function MobileMoreSheet({ isOpen, onClose, locale, pathname }: {
   );
 }
 
-export default function DeveloperMobileLayout({ children, locale, userName, userRole, onLogout }: Props) {
+export default function DeveloperMobileLayout({ children, locale, userName, userRole: _userRole, onLogout: _onLogout }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const [showMoreSheet, setShowMoreSheet] = useState(false);
@@ -92,7 +92,7 @@ export default function DeveloperMobileLayout({ children, locale, userName, user
   const isRouteActive = (href: string) =>
     href === "/developer" ? pathname === "/developer" : pathname.startsWith(href);
 
-  const handleTabChange = (key: string, href: string) => {
+  const _handleTabChange = (key: string, href: string) => {
     if (key === "more") {
       setShowMoreSheet(true);
     } else {

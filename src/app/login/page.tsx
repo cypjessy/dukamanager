@@ -51,7 +51,7 @@ export default function LoginPage() {
   }
 
   const fadeUp = (delay = 0) =>
-    mounted ? { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: "easeOut" } } : {};
+    mounted ? { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: "easeOut" as const } } : {};
 
   return (
     <div className="login-page">

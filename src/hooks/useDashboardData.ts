@@ -51,7 +51,7 @@ export function useDashboardData() {
 
   const computeMetrics = useCallback((
     sales: Array<Record<string, unknown>>,
-    products: Array<Record<string, unknown> & { id: string }>,
+    products: Product[],
     customers: Array<Record<string, unknown>>,
     orders: Array<Record<string, unknown>>
   ) => {
@@ -84,7 +84,7 @@ export function useDashboardData() {
       unit: (p.unit || "pieces") as Product["unit"],
       unitLabel: p.unitLabel || { en: "", sw: "" },
       quantity: Number(p.quantity) || 0,
-      reorderPoint: Number(p.reorderPoint || p.minStock) || 10,
+      reorderPoint: Number(p.reorderPoint) || 10,
       buyingPrice: Number(p.buyingPrice) || 0,
       sellingPrice: Number(p.sellingPrice) || 0,
       wholesalePrice: Number(p.wholesalePrice) || 0,
@@ -174,7 +174,7 @@ export function useDashboardData() {
         const { db } = await import("@/lib/firebase/config");
 
         let salesData: Array<Record<string, unknown>> = [];
-        let productsData: Array<Record<string, unknown> & { id: string }> = [];
+        let productsData: Product[] = [];
         let customersData: Array<Record<string, unknown>> = [];
         let ordersData: Array<Record<string, unknown>> = [];
 
@@ -192,7 +192,7 @@ export function useDashboardData() {
 
         // Products
         const unsubProducts = onSnapshot(collection(db, "shops", shopId, "products"), (snap) => {
-          productsData = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+          productsData = snap.docs.map((d) => ({ ...d.data(), id: d.id })) as Product[];
           update();
         });
         unsubRef.current.push(unsubProducts);

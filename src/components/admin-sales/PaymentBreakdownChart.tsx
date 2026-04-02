@@ -46,7 +46,7 @@ export default function PaymentBreakdownChart({ locale, breakdown }: PaymentBrea
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value: number) => [`KSh ${value.toLocaleString()}`, t("Amount", "Kiasi", locale)]}
+                formatter={(value: any) => [`KSh ${Number(value).toLocaleString()}`, t("Amount", "Kiasi", locale)]}
                 contentStyle={{ borderRadius: "12px", border: "1px solid rgba(0,0,0,0.1)", fontSize: "12px" }}
               />
             </PieChart>

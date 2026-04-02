@@ -43,7 +43,7 @@ export default function UploadModal({ isOpen, onClose, locale, onUploaded }: Upl
     defaultValues: { name: "", category: "", description: "", expiryDate: "", tags: "" },
   });
 
-  const categoryName = watch("category");
+  const _categoryName = watch("category");
 
   useEffect(() => {
     if (isOpen) {

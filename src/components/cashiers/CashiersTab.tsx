@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCashierMonitoring } from "@/hooks/useCashierMonitoring";
 import { useLocale } from "@/providers/LocaleProvider";
 import { useViewport } from "@/providers/ViewportProvider";
-import { CashierUser } from "@/hooks/useCashierMonitoring";
+import { CashierUser, CashierPermissions } from "@/hooks/useCashierMonitoring";
 import { UserTable } from "./UserTable";
 import { UserCard } from "./UserCard";
 import { OnboardCashierModal } from "./OnboardCashierModal";
@@ -33,7 +33,7 @@ export function CashiersTab() {
   const [activeFilter, setActiveFilter] = useState<"all" | "active" | "on_break" | "offline" | "suspended">("all");
   const [bulkSelection, setBulkSelection] = useState<Set<string>>(new Set());
   const [isBulkMode, setIsBulkMode] = useState(false);
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [, setLastRefresh] = useState<Date>(new Date());
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
 
   const t = (en: string, sw: string) => (locale === "sw" ? sw : en);

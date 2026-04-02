@@ -30,6 +30,10 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-transparent text-terracotta-600 dark:text-terracotta-400 hover:bg-terracotta-500/10 underline-offset-4 hover:underline",
   danger:
     "bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30",
+  destructive:
+    "bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30",
+  outline:
+    "btn-secondary text-terracotta-600 dark:text-terracotta-400 backdrop-blur-md border border-white/20 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/10",
   ghost:
     "bg-transparent text-warm-600 dark:text-warm-300 hover:bg-white/10 dark:hover:bg-white/5",
   fab:
@@ -37,12 +41,14 @@ const variantStyles: Record<ButtonVariant, string> = {
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
+  xs: "px-3 py-1.5 text-xs rounded-lg min-h-[32px]",
   sm: "px-4 py-2 text-sm rounded-lg min-h-[40px]",
   md: "px-6 py-3 text-sm rounded-xl min-h-[48px]",
   lg: "px-8 py-4 text-base rounded-2xl min-h-[52px]",
 };
 
 const iconOnlySizeStyles: Record<ButtonSize, string> = {
+  xs: "p-1.5 rounded-lg min-h-[32px] min-w-[32px]",
   sm: "p-2 rounded-lg min-h-[40px] min-w-[40px]",
   md: "p-2.5 rounded-xl min-h-[48px] min-w-[48px]",
   lg: "p-3 rounded-2xl min-h-[52px] min-w-[52px]",

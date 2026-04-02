@@ -118,27 +118,28 @@ export function useSuppliersFirestore() {
     if (!shopId) throw new Error("No active shop");
     const { db } = await import("@/lib/firebase/config");
     const now = new Date().toISOString();
-    return addDoc(collection(db, "shops", shopId, "suppliers"), {
+    const supplierData: Record<string, unknown> = {
       name: data.name,
       contactPerson: data.contactPerson || "",
       phone: data.phone || "",
-      whatsapp: data.whatsapp || data.phone?.replace(/\s/g, "") || "",
+      whatsapp: (data as Record<string, unknown>).whatsapp || data.phone?.replace(/\s/g, "") || "",
       email: data.email || "",
-      location: data.location || "",
-      region: data.region || "",
-      distance: Number(data.distance) || 0,
-      category: data.category || "wholesaler",
+      location: (data as Record<string, unknown>).location || "",
+      region: (data as Record<string, unknown>).region || "",
+      distance: Number((data as Record<string, unknown>).distance) || 0,
+      category: (data as Record<string, unknown>).category || "wholesaler",
       paymentTerms: data.paymentTerms || "cod",
-      kraPin: data.kraPin || "",
-      bankName: data.bankName || "",
-      bankAccount: data.bankAccount || "",
-      mpesaPaybill: data.mpesaPaybill || "",
-      mpesaTill: data.mpesaTill || "",
-      avgDeliveryDays: Number(data.avgDeliveryDays) || 3,
+      kraPin: (data as Record<string, unknown>).kraPin || "",
+      bankName: (data as Record<string, unknown>).bankName || "",
+      bankAccount: (data as Record<string, unknown>).bankAccount || "",
+      mpesaPaybill: (data as Record<string, unknown>).mpesaPaybill || "",
+      mpesaTill: (data as Record<string, unknown>).mpesaTill || "",
+      avgDeliveryDays: Number((data as Record<string, unknown>).avgDeliveryDays) || 3,
       rating: 4,
       isActive: true,
       createdAt: now,
-    });
+    };
+    return addDoc(collection(db, "shops", shopId, "suppliers"), supplierData);
   }, [shopId]);
 
   const updateSupplier = useCallback(async (supplierId: string, data: Partial<Supplier>) => {

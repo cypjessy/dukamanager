@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "@/providers/LocaleProvider";
 import { useAuth } from "@/providers/AuthProvider";
@@ -193,7 +193,7 @@ export default function AdminSalesPage() {
 
   const selectedCashier = data.cashierMetrics.find((c) => c.cashierId === reportModal.id) || null;
   const selectedFraudAlert = data.fraudAlerts.find((a) => a.id === fraudModal.alertId) || null;
-  const selectedInventoryItem = data.inventoryImpact.find((i) => i.productId === reorderModal.id) || null;
+  const _selectedInventoryItem = data.inventoryImpact.find((i) => i.productId === reorderModal.id) || null;
 
   if (!shopId) {
     return <div className="flex items-center justify-center min-h-[60vh]"><div className="flex flex-col items-center gap-3"><div className="w-10 h-10 rounded-xl bg-gradient-to-br from-terracotta-500 to-savanna-500 animate-pulse" /><p className="text-sm text-warm-500">{t("Loading...", "Inapakia...", locale)}</p></div></div>;

@@ -62,7 +62,7 @@ export default function DashboardPage() {
   const [activities, setActivities] = useState<DashboardActivity[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [topProducts, setTopProducts] = useState<Array<{ name: string; nameSw: string; sold: number; revenue: number }>>([]);
-  const [inventoryHealth, setInventoryHealth] = useState({ score: 0, inStock: 0, lowStock: 0, outOfStock: 0, total: 0 });
+  const [_inventoryHealth, _setInventoryHealth] = useState({ score: 0, inStock: 0, lowStock: 0, outOfStock: 0, total: 0 });
   const noteInputRef = useRef<HTMLInputElement>(null);
 
   const dailyTarget = 50000;

@@ -63,7 +63,7 @@ export default function SalesChannelsTracker({ locale, channels }: SalesChannels
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8c8a85" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "#8c8a85" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
               <Tooltip
-                formatter={(value: number, name: string) => [name === "revenue" ? `KSh ${value.toLocaleString()}` : value, name]}
+                formatter={(value: any, name: any) => [name === "revenue" ? `KSh ${Number(value).toLocaleString()}` : value, name]}
                 contentStyle={{ borderRadius: "12px", border: "1px solid rgba(0,0,0,0.1)", fontSize: "12px" }}
               />
               <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>

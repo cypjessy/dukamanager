@@ -82,7 +82,7 @@ export default function LoginCard({ locale }: { locale: Locale }) {
                   {locale === "sw" ? "Ingia" : "Login"}
                 </button>
                 <button onClick={() => setMode("register")}
-                  className={`login-card__tab ${mode === "register" ? "login-card__tab--active" : ""}`}>
+                  className={`login-card__tab ${(mode as Mode) === "register" ? "login-card__tab--active" : ""}`}>
                   {locale === "sw" ? "Fungua" : "Create Account"}
                 </button>
               </div>

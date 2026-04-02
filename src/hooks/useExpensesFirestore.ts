@@ -113,7 +113,7 @@ export function useExpensesFirestore() {
   const deleteExpenses = useCallback(async (ids: Set<string>) => {
     if (!shopId) throw new Error("No active shop");
     const { db } = await import("@/lib/firebase/config");
-    for (const id of ids) {
+    for (const id of Array.from(ids)) {
       await deleteDoc(doc(db, "shops", shopId, "expenses", id));
     }
   }, [shopId]);

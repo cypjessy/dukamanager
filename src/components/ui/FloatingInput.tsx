@@ -8,6 +8,7 @@ interface FloatingInputProps
   label: string;
   error?: string;
   icon?: React.ReactNode;
+  className?: string;
 }
 
 const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(

@@ -139,7 +139,7 @@ export function useRegistration() {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ data, currentStep, completedSteps: [...completedSteps] })
+        JSON.stringify({ data, currentStep, completedSteps: Array.from(completedSteps) })
       );
     } catch {}
   }, [data, currentStep, completedSteps]);
@@ -170,7 +170,7 @@ export function useRegistration() {
 
   const nextStep = useCallback(() => {
     if (validateStep(currentStep)) {
-      setCompletedSteps((prev) => new Set([...prev, currentStep]));
+      setCompletedSteps((prev) => new Set([...Array.from(prev), currentStep]));
       if (currentStep < 5) {
         setCurrentStep((currentStep + 1) as RegistrationStep);
       }

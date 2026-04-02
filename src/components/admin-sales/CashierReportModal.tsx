@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Locale } from "@/types";
 import type { CashierMetrics } from "@/hooks/useSalesData";

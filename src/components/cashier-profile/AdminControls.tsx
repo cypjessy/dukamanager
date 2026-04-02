@@ -88,7 +88,7 @@ export function AdminControls({ cashier, locale, onLock, onUnlock, onForceLogout
             {unlocking ? t("Unlocking...", "Inaunlock...") : t("Unlock Portal", "Fungua Kifagio")}
           </Button>
           <Button
-            variant="destructive"
+            variant="danger"
             size="sm"
             onClick={async () => {
               setLoggingOut(true);
@@ -122,8 +122,8 @@ export function AdminControls({ cashier, locale, onLock, onUnlock, onForceLogout
                 {cashier.permissions[perm.key as keyof typeof cashier.permissions] ? t("Allowed", "Ruhusiwa") : t("Denied", "Kataa")}
               </span>
               <Button
-                variant="outline"
-                size="xs"
+              variant="ghost"
+              size="sm"
                 onClick={async () => {
                   setGranting(true);
                   try {
@@ -145,13 +145,14 @@ export function AdminControls({ cashier, locale, onLock, onUnlock, onForceLogout
       {/* Messaging */}
       <div className="rounded-2xl border border-warm-200/60 dark:border-warm-700/60 p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)" }}>
         <h4 className="text-[10px] font-bold text-warm-600 dark:text-warm-400 uppercase tracking-wider mb-2">{t("Broadcast Message", "Tumiajumbe Kuwasiliana")}</h4>
-        <FloatingInput
-          label={t("Message", "Ujumbe")}
-          placeholder={t("Enter message to send to cashier", "Ingiza ujumbe kusuma kwa mhasibu")}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="mb-2"
-        />
+        <div className="mb-2">
+          <FloatingInput
+            label={t("Message", "Ujumbe")}
+            placeholder={t("Enter message to send to cashier", "Ingiza ujumbe kusuma kwa mhasibu")}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+        </div>
         <Button
           variant="primary"
           size="sm"

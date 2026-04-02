@@ -6,6 +6,7 @@ import {
   collection,
   onSnapshot,
 } from "firebase/firestore";
+import type { DateRange } from "@/data/reportData";
 
 interface ReportMetrics {
   totalRevenue: number;

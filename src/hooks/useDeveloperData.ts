@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { collection, getDocs, query, where, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import type { ShopTenant, TenantStatus, SubscriptionTier, ShopHealthAlert, ShopActivity } from "@/data/developerData";
 
@@ -33,7 +33,7 @@ export function useDeveloperData() {
     try {
       const shopsSnap = await getDocs(collection(db, "shops"));
       const usersSnap = await getDocs(collection(db, "users"));
-      const usersByShop: Record<string, any[]> = {};
+      const usersByShop: Record<string, Array<Record<string, unknown>>> = {};
       usersSnap.forEach((doc) => {
         const data = doc.data();
         if (!usersByShop[data.shopId]) usersByShop[data.shopId] = [];
@@ -48,7 +48,7 @@ export function useDeveloperData() {
       const now = new Date();
       let newThisMonth = 0;
 
-      const tenants: ShopTenant[] = shopsSnap.docs.map((shopDoc) => {
+      const tenants = shopsSnap.docs.map((shopDoc) => {
         const shopData = shopDoc.data();
         const shopId = shopDoc.id;
         const shopUsers = usersByShop[shopId] || [];
@@ -69,7 +69,7 @@ export function useDeveloperData() {
           county: shopData.county || "",
           owner: shopData.ownerName || shopUsers[0]?.displayName || "Unknown",
           phone: shopData.phone || shopUsers[0]?.phone || "",
-          email: shopUsers[0]?.email || "",
+          email: (shopUsers[0]?.email as string) || "",
           logo: null,
           status: (shopData.status || "active") as TenantStatus,
           subscription: (shopData.plan || "free") as SubscriptionTier,
@@ -92,7 +92,7 @@ export function useDeveloperData() {
             notifications: { sms: false, email: false, whatsapp: false },
           },
         };
-      });
+      }) as ShopTenant[];
 
       tenants.forEach((t) => {
         totalRevenue += t.monthlyRevenue;
