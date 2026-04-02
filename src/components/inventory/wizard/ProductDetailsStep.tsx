@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import type { Locale } from "@/types";
 import type { NewProductFormData } from "@/lib/addInventorySchema";
 import { INVENTORY_CATEGORIES, UNIT_OPTIONS } from "@/lib/addInventorySchema";
@@ -64,25 +65,27 @@ export default function ProductDetailsStep({ data, errors, locale, onChange }: P
         >
           <input ref={fileRef} type="file" accept="image/jpeg,image/png" capture="environment"
             onChange={(e) => handleImage(e.target.files?.[0] || null)} className="hidden" />
-          {preview ? (
-            <div className="relative py-4">
-              <img src={preview} alt="Product image preview"
-                className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto rounded-xl object-cover shadow-md" />
-              {uploading && (
-                <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center">
-                  <div className="w-16 h-1.5 bg-white/30 rounded-full overflow-hidden">
-                    <div className="h-full bg-forest-500 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-                  </div>
-                </div>
-              )}
-              <button
-                onClick={(e) => { e.stopPropagation(); setPreview(null); onChange("imageFile", undefined); }}
-                className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center text-sm font-bold shadow-lg hover:bg-red-600 active:scale-90 transition-all"
-                aria-label={t("Remove image", "Ondoa picha")}
-              >
-                &times;
-              </button>
-            </div>
+           {preview ? (
+             <div className="relative py-4">
+               <Image src={preview} alt="Product image preview"
+                 className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto rounded-xl object-cover shadow-md"
+                 width={24}
+                 height={24} />
+               {uploading && (
+                 <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center">
+                   <div className="w-16 h-1.5 bg-white/30 rounded-full overflow-hidden">
+                     <div className="h-full bg-forest-500 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+                   </div>
+                 </div>
+               )}
+               <button
+                 onClick={(e) => { e.stopPropagation(); setPreview(null); onChange("imageFile", undefined); }}
+                 className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center text-sm font-bold shadow-lg hover:bg-red-600 active:scale-90 transition-all"
+                 aria-label={t("Remove image", "Ondoa picha")}
+               >
+                 &times;
+               </button>
+             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-6 sm:py-8">
               <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-warm-100 dark:bg-warm-800 flex items-center justify-center mb-3">

@@ -113,14 +113,16 @@ export default function ProductCard({
           <div className="flex items-start gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-start gap-3">
-                {product.imageUrl && product.imageUrl.length > 5 && !imageError ? (
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-warm-200/60 dark:border-warm-700/60"
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
+                 {product.imageUrl && product.imageUrl.length > 5 && !imageError ? (
+                   <Image
+                     src={product.imageUrl}
+                     alt={product.name}
+                     className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-warm-200/60 dark:border-warm-700/60"
+                     width={20}
+                     height={20}
+                     onError={() => setImageError(true)}
+                   />
+                 ) : (
                   <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-warm-100 to-warm-200 dark:from-warm-800 dark:to-warm-700 flex items-center justify-center flex-shrink-0 border border-warm-200/60 dark:border-warm-700/60">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-warm-400">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />

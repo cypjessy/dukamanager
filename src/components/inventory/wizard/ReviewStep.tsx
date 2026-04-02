@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import type { Locale } from "@/types";
 import type { NewProductFormData, WizardStep } from "@/lib/addInventorySchema";
 import { INVENTORY_CATEGORIES, UNIT_OPTIONS } from "@/lib/addInventorySchema";
@@ -39,15 +40,15 @@ export default function ReviewStep({ data, errors, locale, onChange, onEditStep 
       {/* Product Summary Card */}
       <motion.div variants={item} className="rounded-xl border border-warm-200/60 dark:border-warm-700/60 p-4" style={{ background: "rgba(255,255,255,0.6)" }}>
         <div className="flex items-start gap-3">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-warm-100 dark:bg-warm-800 flex items-center justify-center flex-shrink-0 overflow-hidden">
-            {previewImage ? (
-              <img src={previewImage} alt={data.name} className="w-full h-full object-cover" />
-            ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-warm-400">
-                <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
-              </svg>
-            )}
-          </div>
+           <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-warm-100 dark:bg-warm-800 flex items-center justify-center flex-shrink-0 overflow-hidden">
+             {previewImage ? (
+               <Image src={previewImage} alt={data.name} className="w-full h-full object-cover" width={16} height={16} />
+             ) : (
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-warm-400">
+                 <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+               </svg>
+             )}
+           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-heading font-bold text-base text-warm-900 dark:text-warm-50 truncate">{data.name}</h3>
             {data.nameSw && <p className="text-xs text-warm-500 truncate">{data.nameSw}</p>}

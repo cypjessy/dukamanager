@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import FloatingInput from "@/components/ui/FloatingInput";
 import type { RegistrationData } from "@/hooks/useRegistration";
 import type { Locale } from "@/types";
@@ -68,16 +69,16 @@ export default function ShopConfigurationStep({ data, onChange, errors, locale }
 
       {/* Shop Logo */}
       <div className="flex items-center gap-4">
-        <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-lg">
-          {logoPreview ? (
-            <img src={logoPreview} alt="Shop logo" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-terracotta-500 to-savanna-500 flex items-center justify-center">
-              <span className="text-white font-heading font-extrabold text-lg">
-                {data.shopName ? getInitials(data.shopName) : "D"}
-              </span>
-            </div>
-          )}
+         <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-lg">
+           {logoPreview ? (
+             <Image src={logoPreview} alt="Shop logo" className="w-full h-full object-cover" width={16} height={16} />
+           ) : (
+             <div className="w-full h-full bg-gradient-to-br from-terracotta-500 to-savanna-500 flex items-center justify-center">
+               <span className="text-white font-heading font-extrabold text-lg">
+                 {data.shopName ? getInitials(data.shopName) : "D"}
+               </span>
+             </div>
+           )}
           {uploading && (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <div className="w-10 h-1 bg-white/30 rounded-full overflow-hidden">
