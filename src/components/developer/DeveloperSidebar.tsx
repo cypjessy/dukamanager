@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale } from "@/types";
-import { useTheme } from "@/providers/ThemeProvider";
 
 interface Props {
   locale: Locale;

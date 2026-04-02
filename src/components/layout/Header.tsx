@@ -19,7 +19,7 @@ export default function Header({
   locale,
   onToggleSidebar,
 }: HeaderProps) {
-  const { user, currentShop, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { products } = useProducts();
   const { transactions } = useSalesFirestore();
   const { isMobile } = useViewport();
@@ -27,7 +27,6 @@ export default function Header({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showShopSwitcher, setShowShopSwitcher] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -88,7 +87,7 @@ export default function Header({
      const mainArea = document.querySelector(".dashboard-content-scroll");
      if (!mainArea) return;
      const handleScroll = () => {
-       setScrolled(mainArea.scrollTop > 8);
+       // Scroll listener for future use if needed
      };
      mainArea.addEventListener("scroll", handleScroll, { passive: true });
      return () => mainArea.removeEventListener("scroll", handleScroll);

@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/providers/LocaleProvider";
 import { useAuth } from "@/providers/AuthProvider";
-import { useTheme } from "@/providers/ThemeProvider";
 import { getStockStatus } from "@/data/inventoryData";
 import { useProducts } from "@/hooks/useProducts";
 import { useAdminPOS } from "@/hooks/useAdminPOS";

@@ -23,7 +23,7 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
   const [scanHistory, setScanHistory] = useState<Array<{ code: string; product: Product | null; time: string }>>([]);
   const [cameraPermission, setCameraPermission] = useState<"granted" | "denied" | "prompt">("prompt");
   const [torchOn, setTorchOn] = useState(false);
-  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [cameraError, _setCameraError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scannerRef = useRef<HTMLDivElement>(null);
   const html5QrRef = useRef<{ clear: () => void | Promise<void> } | null>(null);
