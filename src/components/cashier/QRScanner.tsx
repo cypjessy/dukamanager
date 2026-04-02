@@ -64,7 +64,7 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
 
   const startCameraScanner = useCallback(async () => {
     if (!scannerRef.current) return;
-    setCameraError(null);
+     _setCameraError(null);
     setScanState("scanning");
 
     try {
@@ -91,7 +91,7 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
       setMode("camera");
     } catch (err) {
       console.error("Camera scanner error:", err);
-      setCameraError("Camera not available or permission denied");
+       _setCameraError("Camera not available or permission denied");
       setCameraPermission("denied");
       setScanState("idle");
     }
@@ -171,12 +171,16 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               style={{ position: "fixed", left: 0, right: 0, bottom: 0, height: "100dvh", borderRadius: "24px 24px 0 0" }}
               className="z-50 bg-whitebg-warm-900 flex flex-col overflow-hidden">
-                <ScannerContent mode={mode} setMode={setMode} scanState={scanState} setScanState={setScanState} manualCode={manualCode}
-                setManualCode={setManualCode} foundProduct={foundProduct} setFoundProduct={setFoundProduct} scanHistory={scanHistory}
-                cameraPermission={cameraPermission} torchOn={torchOn} setTorchOn={setTorchOn}
-                inputRef={inputRef} onManualSubmit={handleManualSubmit}
-                onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
-                onClose={onClose} />
+                 <ScannerContent mode={mode} setMode={setMode} scanState={scanState} setScanState={setScanState} manualCode={manualCode}
+                 setManualCode={setManualCode} foundProduct={foundProduct} setFoundProduct={setFoundProduct} scanHistory={scanHistory}
+                 cameraPermission={cameraPermission} torchOn={torchOn} setTorchOn={setTorchOn}
+                 inputRef={inputRef} scannerRef={scannerRef} html5QrRef={html5QrRef}
+                 onManualSubmit={handleManualSubmit}
+                 onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
+                 onClose={onClose}
+                 cameraError={cameraError}
+                 startCameraScanner={startCameraScanner}
+                 stopCameraScanner={stopCameraScanner} />
             </motion.div>
           ) : (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -185,12 +189,16 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
                 onClick={(e) => e.stopPropagation()}
                 className="bg-whitebg-warm-900 flex flex-col overflow-hidden rounded-[20px] shadow-2xl"
                 style={{ width: "min(480px, calc(100vw - 32px))", maxHeight: "85vh" }}>
-                <ScannerContent mode={mode} setMode={setMode} scanState={scanState} setScanState={setScanState} manualCode={manualCode}
-                  setManualCode={setManualCode} foundProduct={foundProduct} setFoundProduct={setFoundProduct} scanHistory={scanHistory}
-                  cameraPermission={cameraPermission} torchOn={torchOn} setTorchOn={setTorchOn}
-                  inputRef={inputRef} onManualSubmit={handleManualSubmit}
-                  onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
-                  onClose={onClose} />
+                 <ScannerContent mode={mode} setMode={setMode} scanState={scanState} setScanState={setScanState} manualCode={manualCode}
+                   setManualCode={setManualCode} foundProduct={foundProduct} setFoundProduct={setFoundProduct} scanHistory={scanHistory}
+                   cameraPermission={cameraPermission} torchOn={torchOn} setTorchOn={setTorchOn}
+                   inputRef={inputRef} scannerRef={scannerRef} html5QrRef={html5QrRef}
+                   onManualSubmit={handleManualSubmit}
+                   onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
+                   onClose={onClose}
+                   cameraError={cameraError}
+                   startCameraScanner={startCameraScanner}
+                   stopCameraScanner={stopCameraScanner} />
               </motion.div>
             </div>
           )}
@@ -218,16 +226,21 @@ interface ScannerContentProps {
   torchOn: boolean;
   setTorchOn: (v: boolean) => void;
   inputRef: React.RefObject<HTMLInputElement>;
+  scannerRef: React.RefObject<HTMLDivElement>;
   onManualSubmit: () => void;
   onCameraPermission: () => void;
   onScanResult: (p: Product) => void;
   onClose: () => void;
+  cameraError: string | null;
+  startCameraScanner: () => void;
+  stopCameraScanner: () => void;
+  html5QrRef: React.MutableRefObject<{ clear: () => void | Promise<void> } | null>;
 }
 
 function ScannerContent(p: ScannerContentProps) {
   const { mode, setMode, scanState, setScanState, manualCode, setManualCode, foundProduct, setFoundProduct, scanHistory,
     cameraPermission, torchOn, setTorchOn, inputRef, onManualSubmit,
-    onCameraPermission, onScanResult, onClose } = p;
+    onCameraPermission, onScanResult, onClose, cameraError, startCameraScanner, scannerRef, html5QrRef, stopCameraScanner } = p;
 
   const statusColors: Record<ScanState, string> = {
     idle: "text-warm-400",
