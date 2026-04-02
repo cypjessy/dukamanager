@@ -192,7 +192,7 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
                 inputRef={inputRef} scannerRef={scannerRef} html5QrRef={html5QrRef} startCameraScanner={startCameraScanner} stopCameraScanner={stopCameraScanner}
                 onManualSubmit={handleManualSubmit}
                 onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
-                onClose={onClose} />
+                onClose={onClose} isMobile={isMobile} />
             </motion.div>
           ) : (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -207,7 +207,7 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
                   inputRef={inputRef} scannerRef={scannerRef} html5QrRef={html5QrRef} startCameraScanner={startCameraScanner} stopCameraScanner={stopCameraScanner}
                   onManualSubmit={handleManualSubmit}
                   onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
-                  onClose={onClose} />
+                  onClose={onClose} isMobile={isMobile} />
               </motion.div>
             </div>
           )}
@@ -244,12 +244,13 @@ interface ScannerContentProps {
   onCameraPermission: () => void;
   onScanResult: (p: Product) => void;
   onClose: () => void;
+  isMobile: boolean;
 }
 
 function ScannerContent(p: ScannerContentProps) {
   const { mode, setMode, scanState, setScanState, manualCode, setManualCode, foundProduct, setFoundProduct, scanHistory,
     cameraPermission, cameraError, torchOn, setTorchOn, inputRef, scannerRef, html5QrRef, startCameraScanner, stopCameraScanner,
-    onManualSubmit, onCameraPermission, onScanResult, onClose } = p;
+    onManualSubmit, onCameraPermission, onScanResult, onClose, isMobile } = p;
 
   const statusColors: Record<ScanState, string> = {
     idle: "text-warm-400",
@@ -272,8 +273,8 @@ function ScannerContent(p: ScannerContentProps) {
   return (
     <>
       {/* Header */}
-      <div className="flex-shrink-0 p-4 border-b border-warm-100"
-        style={{ paddingTop: "max(8px, env(safe-area-inset-top, 8px))" }}>
+      <div className={`flex-shrink-0 ${isMobile ? 'p-3' : 'p-4'} border-b border-warm-100`}
+        style={{ paddingTop: `max(${isMobile ? 8 : 8}px, env(safe-area-inset-top, ${isMobile ? 8 : 8}px))` }}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-forest-50 flex items-center justify-center text-forest-600">
@@ -333,10 +334,10 @@ function ScannerContent(p: ScannerContentProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className={`${isMobile ? 'flex-1 overflow-y-auto p-3 space-y-3' : 'flex-1 overflow-y-auto p-4 space-y-4'}`}>
         {/* Camera mode */}
         {mode === "camera" && (
-          <div className="space-y-3">
+          <div className={`space-y-3 ${isMobile ? 'h-full flex flex-col' : ''}`}>
             {cameraPermission === "denied" ? (
               <div className="rounded-xl bg-red-50 border border-red-200/60 p-4 text-center">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" className="mx-auto mb-2">
@@ -358,11 +359,11 @@ function ScannerContent(p: ScannerContentProps) {
                 </button>
               </div>
             ) : (
-              <div className="relative rounded-xl overflow-hidden bg-black" style={{ minHeight: "240px" }}>
+              <div className={`relative rounded-xl overflow-hidden bg-black ${isMobile ? 'flex-1 min-h-[300px]' : 'min-h-[200px]'}`}>
                 <div
                   id="qr-scanner-region"
                   ref={scannerRef}
-                  className="w-full h-[240px] sm:h-[280px]"
+                  className="w-full h-full min-h-[200px]"
                 />
                 {scanState !== "scanning" && !html5QrRef.current && (
                   <div className="absolute inset-0 flex items-center justify-center">
