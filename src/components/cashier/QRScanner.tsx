@@ -23,7 +23,7 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
   const [scanHistory, setScanHistory] = useState<Array<{ code: string; product: Product | null; time: string }>>([]);
   const [cameraPermission, setCameraPermission] = useState<"granted" | "denied" | "prompt">("prompt");
   const [torchOn, setTorchOn] = useState(false);
-  const [cameraError, _setCameraError] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scannerRef = useRef<HTMLDivElement>(null);
   const html5QrRef = useRef<{ clear: () => void | Promise<void> } | null>(null);
@@ -63,9 +63,9 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
   const lastScanRef = useRef<{ code: string; time: number } | null>(null);
 
   const startCameraScanner = useCallback(async () => {
-     if (!scannerRef.current) return;
-     _setCameraError(null);
-     setScanState("scanning");
+    if (!scannerRef.current) return;
+    setCameraError(null);
+    setScanState("scanning");
 
     try {
       const { Html5Qrcode } = await import("html5-qrcode");
@@ -91,7 +91,7 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
       setMode("camera");
     } catch (err) {
       console.error("Camera scanner error:", err);
-       _setCameraError("Camera not available or permission denied");
+      setCameraError("Camera not available or permission denied");
       setCameraPermission("denied");
       setScanState("idle");
     }
@@ -166,41 +166,37 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-          {isMobile ? (
-            <motion.div key="scanner-mobile" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              style={{ position: "fixed", left: 0, right: 0, bottom: 0, height: "100dvh", borderRadius: "24px 24px 0 0" }}
-              className="z-50 bg-warm-50 dark:bg-warm-900 flex flex-col overflow-hidden">
-                 <ScannerContent mode={mode} setMode={setMode} scanState={scanState} setScanState={setScanState} manualCode={manualCode}
-                 setManualCode={setManualCode} foundProduct={foundProduct} setFoundProduct={setFoundProduct} scanHistory={scanHistory}
-                 cameraPermission={cameraPermission} torchOn={torchOn} setTorchOn={setTorchOn}
-                 inputRef={inputRef} scannerRef={scannerRef} html5QrRef={html5QrRef}
-                 onManualSubmit={handleManualSubmit}
-                 onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
-                 onClose={onClose}
-                 cameraError={cameraError}
-                 startCameraScanner={startCameraScanner}
-                 stopCameraScanner={stopCameraScanner} />
-            </motion.div>
-          ) : (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
-              <motion.div key="scanner-desktop" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.92 }} transition={{ duration: 0.25 }}
-                onClick={(e) => e.stopPropagation()}
-                className="bg-warm-50 dark:bg-warm-900 flex flex-col overflow-hidden rounded-[20px] shadow-2xl"
-                style={{ width: "min(480px, calc(100vw - 32px))", maxHeight: "85vh" }}>
+           {isMobile ? (
+             <motion.div key="scanner-mobile" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+               transition={{ type: "spring", damping: 30, stiffness: 300 }}
+               style={{ position: "fixed", left: 0, right: 0, bottom: 0, height: "100dvh", borderRadius: "24px 24px 0 0" }}
+               className="z-50 bg-warm-50 dark:bg-warm-900 flex flex-col overflow-hidden">
+                  <ScannerContent mode={mode} setMode={setMode} scanState={scanState} setScanState={setScanState} manualCode={manualCode}
+                  setManualCode={setManualCode} foundProduct={foundProduct} setFoundProduct={setFoundProduct} scanHistory={scanHistory}
+                  cameraPermission={cameraPermission} torchOn={torchOn} setTorchOn={setTorchOn}
+                  inputRef={inputRef} scannerRef={scannerRef} html5QrRef={html5QrRef}
+                  onManualSubmit={handleManualSubmit}
+                  onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
+                  onClose={onClose}
+                  cameraError={cameraError}
+                  startCameraScanner={startCameraScanner}
+                  stopCameraScanner={stopCameraScanner} />
+             </motion.div>
+           ) : (
+             <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+               <motion.div key="scanner-desktop" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.92 }} transition={{ duration: 0.25 }}
+                 onClick={(e) => e.stopPropagation()}
+                 className="bg-warm-50 dark:bg-warm-900 flex flex-col overflow-hidden rounded-[20px] shadow-2xl"
+                 style={{ width: "min(480px, calc(100vw - 32px))", maxHeight: "85vh" }}>
                  <ScannerContent mode={mode} setMode={setMode} scanState={scanState} setScanState={setScanState} manualCode={manualCode}
                    setManualCode={setManualCode} foundProduct={foundProduct} setFoundProduct={setFoundProduct} scanHistory={scanHistory}
-                   cameraPermission={cameraPermission} torchOn={torchOn} setTorchOn={setTorchOn}
-                   inputRef={inputRef} scannerRef={scannerRef} html5QrRef={html5QrRef}
-                   onManualSubmit={handleManualSubmit}
+                   cameraPermission={cameraPermission} cameraError={cameraError} torchOn={torchOn} setTorchOn={setTorchOn}
+                   inputRef={inputRef} onManualSubmit={handleManualSubmit}
                    onCameraPermission={handleCameraPermission} onScanResult={onScanResult}
-                   onClose={onClose}
-                   cameraError={cameraError}
-                   startCameraScanner={startCameraScanner}
-                   stopCameraScanner={stopCameraScanner} />
-              </motion.div>
-            </div>
+                   onClose={onClose} />
+               </motion.div>
+             </div>
           )}
         </>
       )}
@@ -223,24 +219,20 @@ interface ScannerContentProps {
   setFoundProduct: (p: Product | null) => void;
   scanHistory: Array<{ code: string; product: Product | null; time: string }>;
   cameraPermission: "granted" | "denied" | "prompt";
+  cameraError: string | null;
   torchOn: boolean;
   setTorchOn: (v: boolean) => void;
   inputRef: React.RefObject<HTMLInputElement>;
-  scannerRef: React.RefObject<HTMLDivElement>;
   onManualSubmit: () => void;
   onCameraPermission: () => void;
   onScanResult: (p: Product) => void;
   onClose: () => void;
-  cameraError: string | null;
-  startCameraScanner: () => void;
-  stopCameraScanner: () => void;
-  html5QrRef: React.MutableRefObject<{ clear: () => void | Promise<void> } | null>;
 }
 
 function ScannerContent(p: ScannerContentProps) {
   const { mode, setMode, scanState, setScanState, manualCode, setManualCode, foundProduct, setFoundProduct, scanHistory,
-    cameraPermission, torchOn, setTorchOn, inputRef, onManualSubmit,
-    onCameraPermission, onScanResult, onClose, cameraError, startCameraScanner, scannerRef, html5QrRef, stopCameraScanner } = p;
+    cameraPermission, cameraError, torchOn, setTorchOn, inputRef, onManualSubmit,
+    onCameraPermission, onScanResult, onClose } = p;
 
   const statusColors: Record<ScanState, string> = {
     idle: "text-warm-400",
@@ -263,11 +255,15 @@ function ScannerContent(p: ScannerContentProps) {
   return (
     <>
       {/* Header */}
+<<<<<<< HEAD
           <div className="flex-shrink-0 p-4 border-b border-warm-100 border-warm-800"
+=======
+      <div className="flex-shrink-0 p-4 border-b border-warm-100"
+>>>>>>> 602175cb09cdd3baec1e56261d8f0748a11ce3e7
         style={{ paddingTop: "max(8px, env(safe-area-inset-top, 8px))" }}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-forest-50bg-forest-900/20 flex items-center justify-center text-forest-600">
+            <div className="w-10 h-10 rounded-xl bg-forest-50 flex items-center justify-center text-forest-600">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
                 <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="3" height="3" rx="0.5" />
@@ -275,13 +271,13 @@ function ScannerContent(p: ScannerContentProps) {
                 <rect x="18" y="18" width="3" height="3" rx="0.5" />
               </svg>
             </div>
-            <div>
-               <h2 className="font-heading font-bold text-base text-warm-900 text-warm-50">Scan Product</h2>
-              <p className={`text-[10px] font-medium ${statusColors[scanState]}`}>{statusLabels[scanState]}</p>
-            </div>
-          </div>
-          <button onClick={onClose}
-             className="w-10 h-10 rounded-lg flex items-center justify-center text-warm-400 hover:text-warm-600 hover:bg-warm-100 hover:bg-warm-800 transition-colors min-h-[40px]"
+             <div>
+                <h2 className="font-heading font-bold text-base text-warm-900 text-warm-50">Scan Product</h2>
+               <p className={`text-[10px] font-medium ${statusColors[scanState]}`}>{statusLabels[scanState]}</p>
+             </div>
+           </div>
+           <button onClick={onClose}
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-warm-400 hover:text-warm-600 hover:bg-warm-100 hover:bg-warm-800 transition-colors min-h-[40px]"
             aria-label="Close">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
@@ -294,19 +290,17 @@ function ScannerContent(p: ScannerContentProps) {
             { key: "camera" as ScanMode, label: "Camera", icon: "\uD83D\uDCF7" },
             { key: "hardware" as ScanMode, label: "Scanner", icon: "\uD83D\uDD0D" },
           ]).map((m) => (
-               <button key={m.key} onClick={() => {
-               if (m.key === "camera" && cameraPermission === "prompt") { onCameraPermission(); return; }
-               setMode(m.key);
-               if (m.key === "manual") setScanState("idle");
-               if (m.key === "hardware") setScanState("scanning");
-             }}
-               className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 min-h-[36px] transition-all ${
-                 mode === m.key 
-                   ? "bg-terracotta-500 text-white shadow-md" 
-                   : "bg-warm-100/30 bg-warm-800/30 text-warm-500/60 text-warm-400/60 backdrop-blur backdrop-blur-md hover:bg-warm-100/40 hover:bg-warm-800/40"
-               }`}>
-               <span>{m.icon}</span> {m.label}
-             </button>
+            <button key={m.key} onClick={() => {
+              if (m.key === "camera" && cameraPermission === "prompt") { onCameraPermission(); return; }
+              setMode(m.key);
+              if (m.key === "manual") setScanState("idle");
+              if (m.key === "hardware") setScanState("scanning");
+            }}
+              className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 min-h-[36px] transition-all ${
+                mode === m.key ? "bg-terracotta-500 text-white" : "bg-warm-100 text-warm-500"
+              }`}>
+              <span>{m.icon}</span> {m.label}
+            </button>
           ))}
         </div>
       </div>
@@ -332,7 +326,7 @@ function ScannerContent(p: ScannerContentProps) {
                   <line x1="1" y1="1" x2="23" y2="23" />
                 </svg>
                 <p className="text-sm font-medium text-red-600">{cameraError}</p>
-                <button onClick={startCameraScanner} className="mt-2 px-4 py-2 rounded-xl bg-terracotta-500 text-white text-sm font-bold">
+                <button onClick={onCameraPermission} className="mt-2 px-4 py-2 rounded-xl bg-terracotta-500 text-white text-sm font-bold">
                   Retry
                 </button>
               </div>
@@ -370,54 +364,57 @@ function ScannerContent(p: ScannerContentProps) {
         )}
 
         {/* Manual entry */}
-        {mode === "manual" && (
-          <div className="space-y-3">
-            <div>
-               <label className="block text-xs font-medium text-warm-500 text-warm-400 mb-1.5">Enter SKU or Barcode</label>
-              <div className="flex gap-2">
-                <input ref={inputRef} type="text" value={manualCode} onChange={(e) => setManualCode(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && onManualSubmit()}
-                  placeholder="Type or paste code..."
-                   className="flex-1 px-4 py-3 rounded-xl bg-warm-50 bg-warm-800/60 border border-warm-200 border-warm-700 text-sm outline-none focus:border-terracotta-500 font-mono min-h-[48px]"
-                  style={{ fontSize: "16px" }} />
-                <button onClick={onManualSubmit} disabled={!manualCode.trim() || scanState === "looking_up"}
-                  className="px-4 py-3 rounded-xl bg-terracotta-500 text-white text-sm font-bold hover:bg-terracotta-600 disabled:opacity-40 min-h-[48px] flex items-center gap-1.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-                  Look Up
-                </button>
-              </div>
-            </div>
-            {/* Quick SKU chips from products */}
-            <div>
-              <p className="text-[10px] text-warm-400 mb-1.5">Quick scan (tap to simulate)</p>
-              <div className="flex flex-wrap gap-1.5">
-                {inventoryProducts.slice(0, 8).map((p) => (
-                  <button key={p.id} onClick={() => { setManualCode(p.sku); onManualSubmit(); }}
-                     className="px-2 py-1 rounded-lg text-[10px] font-mono bg-warm-100 bg-warm-800 text-warm-500 text-warm-400 hover:bg-warm-200 hover:bg-warm-700 min-h-[28px]">
-                    {p.sku}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+         {mode === "manual" && (
+           <div className="space-y-3">
+             <div>
+                <label className="block text-xs font-medium text-warm-500 text-warm-400 mb-1.5">Enter SKU or Barcode</label>
+               <div className="flex gap-2">
+                 <input ref={inputRef} type="text" value={manualCode} onChange={(e) => setManualCode(e.target.value)}
+                   onKeyDown={(e) => e.key === "Enter" && onManualSubmit()}
+                   placeholder="Type or paste code..."
+                    className="flex-1 px-4 py-3 rounded-xl bg-warm-50 bg-warm-800/60 border border-warm-200 border-warm-700 text-sm outline-none focus:border-terracotta-500 font-mono min-h-[48px]"
+                   style={{ fontSize: "16px" }} />
+                 <button onClick={onManualSubmit} disabled={!manualCode.trim() || scanState === "looking_up"}
+                   className="px-4 py-3 rounded-xl bg-terracotta-500 text-white text-sm font-bold hover:bg-terracotta-600 disabled:opacity-40 min-h-[48px] flex items-center gap-1.5">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                   Look Up
+                 </button>
+               </div>
+             </div>
+             {/* Quick SKU chips from products */}
+             <div>
+               <p className="text-[10px] text-warm-400 mb-1.5">Quick scan (tap to simulate)</p>
+               <div className="flex flex-wrap gap-1.5">
+                 {inventoryProducts.slice(0, 8).map((p) => (
+                      className="px-2 py-1 rounded-lg text-[10px] font-mono bg-warm-100 bg-warm-800 text-warm-500 text-warm-400 hover:bg-warm-200 hover:bg-warm-700 min-h-[28px]">
+                     {p.sku}
+                   </button>
+                 ))}
+               </div>
+             </div>
+           </div>
+         )}
 
         {/* Hardware scanner mode */}
         {mode === "hardware" && (
           <div className="space-y-3">
-            <div className="rounded-xl border border-forest-200/60border-forest-700/30 bg-forest-50/50bg-forest-900/10 p-4 text-center">
-              <div className="w-12 h-12 rounded-full bg-forest-100bg-forest-900/30 flex items-center justify-center mx-auto mb-2">
+            <div className="rounded-xl border border-forest-200/60 bg-forest-50/50 p-4 text-center">
+              <div className="w-12 h-12 rounded-full bg-forest-100 flex items-center justify-center mx-auto mb-2">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" strokeWidth="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" /><rect x="7" y="7" width="3" height="3" rx="0.5" />
                   <rect x="14" y="7" width="3" height="3" rx="0.5" /><rect x="7" y="14" width="3" height="3" rx="0.5" />
                   <rect x="14" y="14" width="3" height="3" rx="0.5" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-forest-700text-forest-400">Hardware Scanner Mode</p>
+              <p className="text-sm font-medium text-forest-700">Hardware Scanner Mode</p>
               <p className="text-xs text-warm-400 mt-1">Scan a barcode with your USB/Bluetooth scanner</p>
               <p className="text-[10px] text-warm-300 mt-2">Scanner acts as keyboard input - just scan and it will appear here</p>
             </div>
+<<<<<<< HEAD
              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-warm-50 bg-warm-800/50">
+=======
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-warm-50">
+>>>>>>> 602175cb09cdd3baec1e56261d8f0748a11ce3e7
               <span className={`w-2 h-2 rounded-full ${scanState === "scanning" ? "bg-forest-500 animate-pulse" : "bg-warm-300"}`} />
               <span className="text-xs text-warm-500">{scanState === "scanning" ? "Listening for scan..." : "Ready"}</span>
             </div>
@@ -428,17 +425,17 @@ function ScannerContent(p: ScannerContentProps) {
         <AnimatePresence>
           {foundProduct && scanState === "found" && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-              className="rounded-xl border border-forest-200/60border-forest-700/30 bg-forest-50/50bg-forest-900/10 p-4">
+              className="rounded-xl border border-forest-200/60 bg-forest-50/50 p-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-forest-100bg-forest-900/30 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-forest-100 flex items-center justify-center">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5A3D" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-forest-700text-forest-400">Bidhaa Imepatikana!</p>
-                  <p className="text-xs text-warm-500">{foundProduct.name}</p>
-                   <p className="text-lg font-heading font-extrabold text-warm-900 text-warm-50 tabular-nums mt-1">
-                    KSh {foundProduct.sellingPrice.toLocaleString()}
-                  </p>
+                 <div className="min-w-0 flex-1">
+                   <p className="text-sm font-bold text-forest-700">Bidhaa Imepatikana!</p>
+                   <p className="text-xs text-warm-500">{foundProduct.name}</p>
+                    <p className="text-lg font-heading font-extrabold text-warm-900 text-warm-50 tabular-nums mt-1">
+                     KSh {foundProduct.sellingPrice.toLocaleString()}
+                   </p>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-warm-400">Stock: {foundProduct.quantity}</p>
@@ -455,11 +452,15 @@ function ScannerContent(p: ScannerContentProps) {
         {/* Not found */}
         {scanState === "not_found" && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border border-red-200/60border-red-700/30 bg-red-50/50bg-red-900/10 p-4 text-center">
+            className="rounded-xl border border-red-200/60 bg-red-50/50 p-4 text-center">
             <p className="text-sm font-medium text-red-600">Product not found</p>
             <p className="text-xs text-warm-400 mt-1">Check the code and try again</p>
             <button onClick={() => { setScanState("idle"); setManualCode(""); }}
+<<<<<<< HEAD
                              className="mt-2 px-3 py-1.5 rounded-lg bg-warm-100 bg-warm-800 text-xs font-medium text-warm-600 min-h-[32px]">
+=======
+              className="mt-2 px-3 py-1.5 rounded-lg bg-warm-100 text-xs font-medium text-warm-600 min-h-[32px]">
+>>>>>>> 602175cb09cdd3baec1e56261d8f0748a11ce3e7
               Try Again
             </button>
           </motion.div>
@@ -471,7 +472,11 @@ function ScannerContent(p: ScannerContentProps) {
             <p className="text-[10px] font-medium text-warm-400 uppercase tracking-wider mb-2">Recent Scans</p>
             <div className="space-y-1.5">
               {scanHistory.slice(0, 5).map((item, i) => (
+<<<<<<< HEAD
                  <div key={i} className="flex items-center justify-between py-2 px-3 rounded-lg bg-warm-50 bg-warm-800/50">
+=======
+                <div key={i} className="flex items-center justify-between py-2 px-3 rounded-lg bg-warm-50">
+>>>>>>> 602175cb09cdd3baec1e56261d8f0748a11ce3e7
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-mono text-warm-500 truncate">{item.code}</p>
                     {item.product && <p className="text-[10px] text-warm-400 truncate">{item.product.name}</p>}
@@ -493,10 +498,14 @@ function ScannerContent(p: ScannerContentProps) {
       </div>
 
       {/* Footer */}
-      <div className="flex-shrink-0 border-t border-warm-100border-warm-800 p-4"
+      <div className="flex-shrink-0 border-t border-warm-100 p-4"
         style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))" }}>
         <button onClick={onClose}
+<<<<<<< HEAD
            className="w-full py-3 rounded-xl bg-warm-100 text-warm-600 text-sm font-bold min-h-[48px]">
+=======
+          className="w-full py-3 rounded-xl bg-warm-100 text-warm-600 text-sm font-bold min-h-[48px]">
+>>>>>>> 602175cb09cdd3baec1e56261d8f0748a11ce3e7
           Close Scanner
         </button>
       </div>
