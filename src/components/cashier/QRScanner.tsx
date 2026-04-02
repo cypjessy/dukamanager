@@ -30,22 +30,59 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
   const { isMobile } = useResponsiveDialog();
 
   const lookupProduct = useCallback((code: string): Product | null => {
-    const normalized = code.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    return inventoryProducts.find((p) =>
-      p.sku.toUpperCase().replace(/[^A-Z0-9]/g, "").includes(normalized) ||
-      normalized.includes(p.sku.toUpperCase().replace(/[^A-Z0-9]/g, ""))
-    ) || null;
+    console.log("Looking up product for code:", code);
+
+    // First try exact match with SKU
+    const exactMatch = inventoryProducts.find((p) => p.sku === code);
+    if (exactMatch) {
+      console.log("Found exact SKU match:", exactMatch.name);
+      return exactMatch;
+    }
+
+    // Try partial matches (more flexible)
+    const normalizedCode = code.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    console.log("Normalized code:", normalizedCode);
+
+    // Look for products where SKU contains the code or vice versa
+    const partialMatch = inventoryProducts.find((p) => {
+      const normalizedSku = p.sku.toUpperCase().replace(/[^A-Z0-9]/g, "");
+      return normalizedSku.includes(normalizedCode) || normalizedCode.includes(normalizedSku);
+    });
+
+    if (partialMatch) {
+      console.log("Found partial match:", partialMatch.name, "SKU:", partialMatch.sku);
+      return partialMatch;
+    }
+
+    // Try matching just the numeric part
+    const numericPart = code.replace(/[^0-9]/g, "");
+    if (numericPart.length >= 3) {
+      const numericMatch = inventoryProducts.find((p) => {
+        const skuNumbers = p.sku.replace(/[^0-9]/g, "");
+        return skuNumbers.includes(numericPart) || numericPart.includes(skuNumbers);
+      });
+      if (numericMatch) {
+        console.log("Found numeric match:", numericMatch.name, "SKU:", numericMatch.sku);
+        return numericMatch;
+      }
+    }
+
+    console.log("No product found for code:", code);
+    return null;
   }, []);
 
   const handleScan = useCallback((code: string) => {
+    console.log("Handling scan for code:", code);
     setScanState("looking_up");
     setTimeout(() => {
       const product = lookupProduct(code);
+      console.log("Lookup result:", product ? `Found: ${product.name}` : "Not found");
       setFoundProduct(product);
       setScanHistory((prev) => [{ code, product, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 10));
       setScanState(product ? "found" : "not_found");
       if (product) {
         setTimeout(() => {
+          console.log("Calling onScanResult with product:", product.name);
           onScanResult(product);
           setManualCode("");
           setScanState("idle");
@@ -75,17 +112,23 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
       await scanner.start(
         { facingMode: "environment" },
         {
-          fps: 10,
-          qrbox: { width: 250, height: 150 },
+          fps: 15,
+          qrbox: { width: 300, height: 200 },
           aspectRatio: 1.777,
         },
         (decodedText) => {
+          console.log("Scanned code:", decodedText);
           const now = Date.now();
           if (lastScanRef.current?.code === decodedText && now - lastScanRef.current.time < 2000) return;
           lastScanRef.current = { code: decodedText, time: now };
           handleScan(decodedText);
         },
-        () => {}
+        (errorMessage) => {
+          // Only log errors, not every frame
+          if (errorMessage && !errorMessage.includes("No QR code found")) {
+            console.log("Scan error:", errorMessage);
+          }
+        }
       );
       setCameraPermission("granted");
       setMode("camera");
