@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import type { Expense, ExpenseCategory, PaymentMethod } from "@/data/expenseData";
 import { categoryConfig } from "@/data/expenseData";
 import ExpenseCard from "./ExpenseCard";
@@ -465,9 +466,9 @@ export default function ExpenseList({
                 {viewDetails.receiptUrl && (
                   <div className="mt-4">
                     <p className="text-xs font-medium text-warm-500 dark:text-warm-400 mb-2">Receipt</p>
-                    <a href={viewDetails.receiptUrl} target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-warm-200/60 dark:border-warm-700/60 hover:opacity-90 transition-opacity">
-                      <img src={viewDetails.receiptUrl} alt="Expense receipt" className="w-full h-40 object-cover" />
-                    </a>
+                     <a href={viewDetails.receiptUrl} target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-warm-200/60 dark:border-warm-700/60 hover:opacity-90 transition-opacity">
+                       <Image src={viewDetails.receiptUrl} alt="Expense receipt" className="w-full h-40 object-cover" width={800} height={400} />
+                     </a>
                     <a href={viewDetails.receiptUrl} target="_blank" rel="noopener noreferrer" className="mt-2 block text-center text-xs text-terracotta-500 hover:text-terracotta-600 font-medium">
                       View full receipt
                     </a>

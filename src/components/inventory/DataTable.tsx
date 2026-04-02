@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import type { Product } from "@/data/inventoryData";
 import { getStockStatus, getProfitMargin, getDaysUntilStockout, suppliers } from "@/data/inventoryData";
 import StockLevelIndicator from "./StockLevelIndicator";
@@ -16,10 +17,12 @@ function ProductImageCell({ product }: { product: Product }) {
     );
   }
   return (
-    <img
+    <Image
       src={product.imageUrl}
       alt={product.name}
       className="w-8 h-8 rounded-lg object-cover flex-shrink-0 border border-warm-200/60 dark:border-warm-700/60"
+      width={8}
+      height={8}
       onError={() => setErr(true)}
     />
   );

@@ -53,7 +53,7 @@ function AnimatedCounter({ value, prefix = "", suffix = "" }: { value: number; p
 
 export default function InventoryAnalytics({ products }: InventoryAnalyticsProps) {
   const { locale } = useLocale();
-  const t = (en: string, sw: string) => locale === "sw" ? sw : en;
+  const t = useCallback((en: string, sw: string) => locale === "sw" ? sw : en, [locale]);
 
   const statusCounts = useMemo(() => {
     const counts: Record<StockStatus, number> = { healthy: 0, low: 0, critical: 0, out: 0 };

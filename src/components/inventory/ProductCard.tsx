@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import Image from "next/image";
 import type { Product, StockStatus } from "@/data/inventoryData";
 import { getStockStatus, getProfitMargin, getDaysUntilStockout } from "@/data/inventoryData";
 import StockLevelIndicator from "./StockLevelIndicator";
