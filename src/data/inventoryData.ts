@@ -29,6 +29,7 @@ export interface Product {
   description: string;
   salesVelocity: number;
   warehouse: string;
+  barcode?: string;
   imageUrl?: string;
   createdAt: string;
 }

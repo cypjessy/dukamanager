@@ -30,44 +30,63 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
   const { isMobile } = useResponsiveDialog();
 
   const lookupProduct = useCallback((code: string): Product | null => {
-    console.log("Looking up product for code:", code);
+    const trimmedCode = code.trim();
+    console.log("Looking up product for code:", trimmedCode);
 
-    // First try exact match with SKU
-    const exactMatch = inventoryProducts.find((p) => p.sku === code);
-    if (exactMatch) {
-      console.log("Found exact SKU match:", exactMatch.name);
-      return exactMatch;
+    // exact sku match
+    const exactSku = inventoryProducts.find((p) => p.sku.toUpperCase() === trimmedCode.toUpperCase());
+    if (exactSku) {
+      console.log("Found exact SKU match:", exactSku.name, exactSku.sku);
+      return exactSku;
     }
 
-    // Try partial matches (more flexible)
-    const normalizedCode = code.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    console.log("Normalized code:", normalizedCode);
+    // exact barcode match (for products with barcode field)
+    const exactBarcode = inventoryProducts.find((p) => p.barcode && p.barcode.toUpperCase() === trimmedCode.toUpperCase());
+    if (exactBarcode) {
+      console.log("Found exact barcode match:", exactBarcode.name, exactBarcode.barcode);
+      return exactBarcode;
+    }
 
-    // Look for products where SKU contains the code or vice versa
+    const normalizedCode = trimmedCode.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const numericCode = trimmedCode.replace(/[^0-9]/g, "");
+
+    console.log("Normalized code:", normalizedCode, "numeric code:", numericCode);
+
+    // flexible sku/barcode partial match
     const partialMatch = inventoryProducts.find((p) => {
       const normalizedSku = p.sku.toUpperCase().replace(/[^A-Z0-9]/g, "");
-      return normalizedSku.includes(normalizedCode) || normalizedCode.includes(normalizedSku);
+      const normalizedBarcode = p.barcode ? p.barcode.toUpperCase().replace(/[^A-Z0-9]/g, "") : "";
+      return (
+        normalizedSku.includes(normalizedCode) ||
+        normalizedCode.includes(normalizedSku) ||
+        (normalizedBarcode && (normalizedBarcode.includes(normalizedCode) || normalizedCode.includes(normalizedBarcode)))
+      );
     });
 
     if (partialMatch) {
-      console.log("Found partial match:", partialMatch.name, "SKU:", partialMatch.sku);
+      console.log("Found partial match:", partialMatch.name, "SKU:", partialMatch.sku, "barcode:", partialMatch.barcode);
       return partialMatch;
     }
 
-    // Try matching just the numeric part
-    const numericPart = code.replace(/[^0-9]/g, "");
-    if (numericPart.length >= 3) {
+    // numeric-only matching ({ CER-001 => 001 etc }, plus possible EAN/UPC code forms)
+    if (numericCode.length > 2) {
       const numericMatch = inventoryProducts.find((p) => {
         const skuNumbers = p.sku.replace(/[^0-9]/g, "");
-        return skuNumbers.includes(numericPart) || numericPart.includes(skuNumbers);
+        const barcodeNumbers = (p.barcode || "").replace(/[^0-9]/g, "");
+        return (
+          skuNumbers === numericCode ||
+          numericCode === skuNumbers ||
+          barcodeNumbers === numericCode ||
+          numericCode === barcodeNumbers
+        );
       });
       if (numericMatch) {
-        console.log("Found numeric match:", numericMatch.name, "SKU:", numericMatch.sku);
+        console.log("Found numeric match:", numericMatch.name, "SKU:", numericMatch.sku, "barcode:", numericMatch.barcode);
         return numericMatch;
       }
     }
 
-    console.log("No product found for code:", code);
+    console.log("No product found for code:", trimmedCode);
     return null;
   }, []);
 
