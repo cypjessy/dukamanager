@@ -112,7 +112,14 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
       stream.getTracks().forEach((t) => t.stop());
-      startCameraScanner();
+      setCameraPermission("granted");
+      setMode("camera");
+      // Start camera after permission is granted and mode is set
+      setTimeout(() => {
+        if (scannerRef.current) {
+          startCameraScanner();
+        }
+      }, 300);
     } catch {
       setCameraPermission("denied");
       setMode("manual");
@@ -120,11 +127,19 @@ export default function QRScanner({ isOpen, onClose, onScanResult }: QRScannerPr
   }, [startCameraScanner]);
 
   useEffect(() => {
-    if (isOpen && mode === "camera" && cameraPermission === "granted") {
-      startCameraScanner();
+    if (isOpen && mode === "camera" && cameraPermission === "granted" && !html5QrRef.current) {
+      // Only start if not already started
+      const timer = setTimeout(() => startCameraScanner(), 200);
+      return () => clearTimeout(timer);
     }
-    return () => { stopCameraScanner(); };
-  }, [isOpen, mode, cameraPermission, startCameraScanner, stopCameraScanner]);
+  }, [isOpen, mode, cameraPermission, startCameraScanner]);
+
+  // Stop camera when mode changes or dialog closes
+  useEffect(() => {
+    if (!isOpen || mode !== "camera") {
+      stopCameraScanner();
+    }
+  }, [isOpen, mode, stopCameraScanner]);
 
   // Hardware scanner keyboard listener
   useEffect(() => {
@@ -288,7 +303,22 @@ function ScannerContent(p: ScannerContentProps) {
             { key: "hardware" as ScanMode, label: "Scanner", icon: "\uD83D\uDD0D" },
           ]).map((m) => (
             <button key={m.key} onClick={() => {
-              if (m.key === "camera" && cameraPermission === "prompt") { onCameraPermission(); return; }
+              if (m.key === "camera") {
+                if (cameraPermission === "prompt") {
+                  onCameraPermission();
+                } else if (cameraPermission === "granted") {
+                  setMode("camera");
+                  // Wait for scannerRef to be mounted, then start camera
+                  setTimeout(() => {
+                    if (scannerRef.current) {
+                      startCameraScanner();
+                    }
+                  }, 300);
+                } else {
+                  setMode("camera");
+                }
+                return;
+              }
               setMode(m.key);
               if (m.key === "manual") setScanState("idle");
               if (m.key === "hardware") setScanState("scanning");
